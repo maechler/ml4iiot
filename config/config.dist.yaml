@@ -1,0 +1,27 @@
+pipeline:
+  input:
+    class: ml4iiot.input.csvinput.CsvInput
+    config:
+      window_size: 720
+      stride_size: 360
+      resample:
+        enabled: True
+        target_sampling_rate: 10s
+        method: interpolate
+        interpolation_method: linear
+      delimiter: ','
+      csv_file: /some/path/to/your/data.csv
+      index_column: datetime
+      columns:
+        datetime:
+          type: datetime
+          datetime_format: 'iso'
+        sensor_a_value: float
+        sensor_b_value: float
+  output:
+    class: ml4iiot.output.stdoutput.StdOutput
+  algorithm:
+    class: ml4iiot.algorithms.stochastic.average.Average
+      value_columns:
+        - sensor_a_value
+        - sensor_b_value

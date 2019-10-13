@@ -1,0 +1,11 @@
+/.idea
+/env
+
+*.pyc
+.DS_Store
+
+/config/*
+!/config/config.dist.yaml
+
+/out/*
+!/out/.gitkeep
