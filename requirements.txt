@@ -1,0 +1,6 @@
+kafka~=1.3.5
+numpy~=1.15.2
+matplotlib~=2.2.4
+keras~=2.3.0
+tensorflow~=2.0.0
+pandas~=0.25.1
