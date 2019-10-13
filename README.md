@@ -64,7 +64,7 @@ pipeline:
     class: ml4iiot.output.stdoutput.StdOutput
   algorithm:
     class: ml4iiot.algorithms.stochastic.average.Average
-      value_columns:
+      columns:
         - sensor_a_value
         - sensor_b_value
 ```
