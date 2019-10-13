@@ -16,11 +16,11 @@ class TestInput(AbstractInput):
     def next_data_frame(self, recommended_frame_size=None, recommended_end_timestamp=None):
         next_data_frame = next(self.test_data_iter)
         datetime_column = self.get_config('datetime_column')
-        col = next_data_frame[datetime_column]
-        datet = datetime.utcfromtimestamp(col)
+        datetime_column_value = next_data_frame[datetime_column]
+        datetime_column_object = datetime.utcfromtimestamp(datetime_column_value)
 
         return pd.DataFrame({
-            datetime_column: [datet],
+            datetime_column: [datetime_column_object],
             'value': [next_data_frame['value']]},
             columns=[datetime_column, 'value']
         ).set_index(datetime_column)
@@ -61,9 +61,9 @@ class TestAbstractInputWithoutResample(unittest.TestCase):
         test_input_9 = self.create_test_input(9, 1, test_data)
         batch_9 = test_input_9.next_batch()
 
-        self.assertEqual(len(batch_1), 1)
-        self.assertEqual(len(batch_2), 2)
-        self.assertEqual(len(batch_9), 9)
+        self.assertEqual(1, len(batch_1))
+        self.assertEqual(2, len(batch_2))
+        self.assertEqual(9, len(batch_9))
 
     def test_stride_small_than_window(self):
         window_size = 2
@@ -84,18 +84,18 @@ class TestAbstractInputWithoutResample(unittest.TestCase):
 
         batch = test_input.next_batch()
 
-        self.assertEqual(len(batch), window_size)
-        self.assertEqual(batch['value'].tolist(), [1, 2])
+        self.assertEqual(window_size, len(batch))
+        self.assertEqual([1, 2], batch['value'].tolist())
 
         batch = test_input.next_batch()
 
-        self.assertEqual(len(batch), window_size)
-        self.assertEqual(batch['value'].tolist(), [2, 3])
+        self.assertEqual(window_size, len(batch))
+        self.assertEqual([2, 3], batch['value'].tolist())
 
         batch = test_input.next_batch()
 
-        self.assertEqual(len(batch), window_size)
-        self.assertEqual(batch['value'].tolist(), [3, 4])
+        self.assertEqual(window_size, len(batch))
+        self.assertEqual([3, 4], batch['value'].tolist())
 
     def test_stride_equals_window(self):
         window_size = 2
@@ -116,18 +116,18 @@ class TestAbstractInputWithoutResample(unittest.TestCase):
 
         batch = test_input.next_batch()
 
-        self.assertEqual(len(batch), window_size)
-        self.assertEqual(batch['value'].tolist(), [1, 2])
+        self.assertEqual(window_size, len(batch))
+        self.assertEqual([1, 2], batch['value'].tolist())
 
         batch = test_input.next_batch()
 
-        self.assertEqual(len(batch), window_size)
-        self.assertEqual(batch['value'].tolist(), [3, 4])
+        self.assertEqual(window_size, len(batch))
+        self.assertEqual([3, 4], batch['value'].tolist())
 
         batch = test_input.next_batch()
 
-        self.assertEqual(len(batch), window_size)
-        self.assertEqual(batch['value'].tolist(), [5, 6])
+        self.assertEqual(window_size, len(batch))
+        self.assertEqual([5, 6], batch['value'].tolist())
 
     def test_stride_bigger_than_window(self):
         window_size = 1
@@ -148,18 +148,18 @@ class TestAbstractInputWithoutResample(unittest.TestCase):
 
         batch = test_input.next_batch()
 
-        self.assertEqual(len(batch), window_size)
-        self.assertEqual(batch['value'].tolist(), [1])
+        self.assertEqual(window_size, len(batch))
+        self.assertEqual([1], batch['value'].tolist())
 
         batch = test_input.next_batch()
 
-        self.assertEqual(len(batch), window_size)
-        self.assertEqual(batch['value'].tolist(), [4])
+        self.assertEqual(window_size, len(batch))
+        self.assertEqual([4], batch['value'].tolist())
 
         batch = test_input.next_batch()
 
-        self.assertEqual(len(batch), window_size)
-        self.assertEqual(batch['value'].tolist(), [7])
+        self.assertEqual(window_size, len(batch))
+        self.assertEqual([7], batch['value'].tolist())
 
     def test_end_of_iter(self):
         window_size = 2

@@ -12,15 +12,15 @@ class AbstractInput(ABC):
 
         self.config = config
         self.iteration_started = False
-        self.window_size = int(self.get_config('window_size'))
-        self.stride_size = int(self.get_config('stride_size'))
+        self.window_size = self.sanitize_size(self.get_config('window_size'))
+        self.stride_size = self.sanitize_size(self.get_config('stride_size'))
         self.resample_enabled = str2bool(self.get_config('resample', 'enabled'))
         self.data_frame_queue = deque(maxlen=self.window_size)
 
         if self.resample_enabled:
             self.target_sampling_rate = self.get_config('resample', 'target_sampling_rate')
-            self.window_size_time_delta = datetime.timedelta(seconds=self.window_size)
-            self.stride_size_time_delta = datetime.timedelta(seconds=self.stride_size)
+            self.window_size_time_delta = self.size_to_timedelta(self.get_config('window_size'))
+            self.stride_size_time_delta = self.size_to_timedelta(self.get_config('stride_size'))
             self.running_data_frame = None
             self.window_next_start_timestamp = None
 
@@ -34,9 +34,6 @@ class AbstractInput(ABC):
     def next_data_frame(self, recommended_frame_size=None, recommended_end_timestamp=None):
         pass
 
-    def get_config(self, *args):
-        return get_recursive_config(self.config, *args)
-
     def __next__(self):
         return self.next_batch()
 
@@ -45,6 +42,18 @@ class AbstractInput(ABC):
         self.data_frame_queue.clear()
 
         return self
+
+    def get_config(self, *args):
+        return get_recursive_config(self.config, *args)
+
+    def sanitize_size(self, size):
+        return int(size.rstrip('ms')) if type(size) is str else size
+
+    def size_to_timedelta(self, size):
+        int_size = int(size.rstrip('ms'))
+        timedelta_milliseconds = int_size if 'ms' in size else 1000 * int_size
+
+        return datetime.timedelta(milliseconds=timedelta_milliseconds)
 
     def next_batch(self):
         return self.next_batch_with_resample() if self.resample_enabled else self.next_batch_without_resample()

@@ -44,8 +44,8 @@ pipeline:
   input:
     class: ml4iiot.input.csvinput.CsvInput
     config:
-      window_size: 720
-      stride_size: 360
+      window_size: 720s
+      stride_size: 360s
       resample:
         enabled: True
         target_sampling_rate: 10s

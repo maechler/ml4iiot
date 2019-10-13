@@ -29,11 +29,11 @@ class TestAbstractInputWithResample(unittest.TestCase):
             'target_sampling_rate': '10s',
             'method': 'ffill',
         }
-        test_input_1 = self.create_test_input(10, 1, resample, test_data)
+        test_input_1 = self.create_test_input('10s', '1s', resample, test_data)
         batch_1 = test_input_1.next_batch()
-        test_input_2 = self.create_test_input(20, 1, resample, test_data)
+        test_input_2 = self.create_test_input('20s', '1s', resample, test_data)
         batch_2 = test_input_2.next_batch()
-        test_input_3 = self.create_test_input(40, 1, resample, test_data)
+        test_input_3 = self.create_test_input('40s', '1s', resample, test_data)
         batch_3 = test_input_3.next_batch()
 
         self.assertEqual(2, len(batch_1))
@@ -41,8 +41,8 @@ class TestAbstractInputWithResample(unittest.TestCase):
         self.assertEqual(5, len(batch_3))
 
     def test_end_of_iter(self):
-        window_size = 10
-        stride_size = 10
+        window_size = '10s'
+        stride_size = '10s'
         resample = {
             'enabled': True,
             'target_sampling_rate': '10s',
@@ -58,9 +58,9 @@ class TestAbstractInputWithResample(unittest.TestCase):
 
         self.assertRaises(StopIteration, test_input.next_batch)
 
-    def test_stride_small_than_window(self):
-        window_size = 30
-        stride_size = 10
+    def test_stride_smaller_than_window(self):
+        window_size = '30s'
+        stride_size = '10s'
         resample = {
             'enabled': True,
             'target_sampling_rate': '10s',
@@ -93,8 +93,8 @@ class TestAbstractInputWithResample(unittest.TestCase):
         self.assertEqual([2, 3, 4, 5], batch['value'].tolist())
 
     def test_stride_equals_window(self):
-        window_size = 20
-        stride_size = 20
+        window_size = '20s'
+        stride_size = '20s'
         resample = {
             'enabled': True,
             'target_sampling_rate': '10s',
@@ -128,8 +128,8 @@ class TestAbstractInputWithResample(unittest.TestCase):
         self.assertEqual([4, 5, 6], batch['value'].tolist())
 
     def test_stride_bigger_than_window(self):
-        window_size = 10
-        stride_size = 30
+        window_size = '10s'
+        stride_size = '30s'
         resample = {
             'enabled': True,
             'target_sampling_rate': '10s',
@@ -164,8 +164,8 @@ class TestAbstractInputWithResample(unittest.TestCase):
         self.assertEqual([6, 7], batch['value'].tolist())
 
     def test_resample_ffill(self):
-        window_size = 50
-        stride_size = 20
+        window_size = '50s'
+        stride_size = '20s'
         resample = {
             'enabled': True,
             'target_sampling_rate': '10s',
@@ -185,8 +185,8 @@ class TestAbstractInputWithResample(unittest.TestCase):
         self.assertEqual([0, 0, 0, 3, 3, 5], batch['value'].tolist())
 
     def test_resample_bfill(self):
-        window_size = 50
-        stride_size = 20
+        window_size = '50s'
+        stride_size = '20s'
         resample = {
             'enabled': True,
             'target_sampling_rate': '10s',
@@ -206,8 +206,8 @@ class TestAbstractInputWithResample(unittest.TestCase):
         self.assertEqual([0, 3, 3, 3, 5, 5], batch['value'].tolist())
 
     def test_resample_interpolate_linear(self):
-        window_size = 100
-        stride_size = 10
+        window_size = '100s'
+        stride_size = '10s'
         resample = {
             'enabled': True,
             'target_sampling_rate': '10s',
@@ -228,8 +228,8 @@ class TestAbstractInputWithResample(unittest.TestCase):
         self.assertEqual([0, 1, 2, 3, 4, 4.5, 5, 5.5, 6, 6.5, 7], batch['value'].tolist())
 
     def test_resample_fill_value(self):
-        window_size = 100
-        stride_size = 10
+        window_size = '100s'
+        stride_size = '10s'
         resample = {
             'enabled': True,
             'target_sampling_rate': '10s',
@@ -250,8 +250,8 @@ class TestAbstractInputWithResample(unittest.TestCase):
         self.assertEqual([0, -1, -1, -1, 4, -1, -1, -1, -1, -1, 7], batch['value'].tolist())
 
     def test_upsampling(self):
-        window_size = 50
-        stride_size = 10
+        window_size = '50s'
+        stride_size = '10s'
         resample = {
             'enabled': True,
             'target_sampling_rate': '5s',
@@ -267,13 +267,13 @@ class TestAbstractInputWithResample(unittest.TestCase):
 
         batch = test_input.next_batch()
 
-        self.assertEqual(len(batch), 11)
-        self.assertEqual(list(map(lambda element: element.timestamp(), batch.index.tolist())), [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50])
+        self.assertEqual(11, len(batch))
+        self.assertEqual([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50], list(map(lambda element: element.timestamp(), batch.index.tolist())))
         self.assertEqual([0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 5], batch['value'].tolist())
 
     def test_downsampling(self):
-        window_size = 60
-        stride_size = 10
+        window_size = '60s'
+        stride_size = '10s'
         resample = {
             'enabled': True,
             'target_sampling_rate': '20s',
@@ -290,13 +290,13 @@ class TestAbstractInputWithResample(unittest.TestCase):
 
         batch = test_input.next_batch()
 
-        self.assertEqual(len(batch), 4)
-        self.assertEqual(list(map(lambda element: element.timestamp(), batch.index.tolist())), [0, 20, 40, 60])
+        self.assertEqual(4, len(batch))
+        self.assertEqual([0, 20, 40, 60], list(map(lambda element: element.timestamp(), batch.index.tolist())))
         self.assertEqual([0, 2, 4, 6], batch['value'].tolist())
 
     def test_long_gap(self):
-        window_size = 40
-        stride_size = 20
+        window_size = '40s'
+        stride_size = '20s'
         resample = {
             'enabled': True,
             'target_sampling_rate': '10s',
@@ -336,8 +336,8 @@ class TestAbstractInputWithResample(unittest.TestCase):
         self.assertEqual([6, 7, 8, 9, 10], batch_4['value'].tolist())
 
     def test_full_example(self):
-        window_size = 40
-        stride_size = 20
+        window_size = '40s'
+        stride_size = '20s'
         resample = {
             'enabled': True,
             'target_sampling_rate': '5s',
@@ -359,14 +359,14 @@ class TestAbstractInputWithResample(unittest.TestCase):
 
         batch_1 = test_input.next_batch()
 
-        self.assertEqual(len(batch_1), 9)
-        self.assertEqual(list(map(lambda element: element.timestamp(), batch_1.index.tolist())), [0, 5, 10, 15, 20, 25, 30, 35, 40])
+        self.assertEqual(9, len(batch_1))
+        self.assertEqual([0, 5, 10, 15, 20, 25, 30, 35, 40], list(map(lambda element: element.timestamp(), batch_1.index.tolist())))
         self.assertEqual([0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4], batch_1['value'].tolist())
 
         batch_2 = test_input.next_batch()
 
-        self.assertEqual(len(batch_2), 9)
-        self.assertEqual(list(map(lambda element: element.timestamp(), batch_2.index.tolist())), [20, 25, 30, 35, 40, 45, 50, 55, 60])
+        self.assertEqual(9, len(batch_2))
+        self.assertEqual([20, 25, 30, 35, 40, 45, 50, 55, 60], list(map(lambda element: element.timestamp(), batch_2.index.tolist())))
         self.assertEqual([2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6], batch_2['value'].tolist())
 
         batch_3 = test_input.next_batch()
