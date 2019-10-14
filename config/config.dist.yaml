@@ -2,13 +2,17 @@ pipeline:
   input:
     class: ml4iiot.input.csvinput.CsvInput
     config:
-      window_size: 720s
-      stride_size: 360s
-      resample:
-        enabled: True
-        target_sampling_rate: 10s
-        method: interpolate
-        interpolation_method: linear
+      windowing_strategy:
+        class: ml4iiot.input.windowing.timebased.TimeBasedWindowingStrategy
+        config:
+          window_size: 720s
+          stride_size: 360s
+          batch_size: 1000
+          resample:
+            enabled: True
+            target_sampling_rate: 10s
+            method: interpolate
+            interpolation_method: linear
       delimiter: ','
       csv_file: /some/path/to/your/data.csv
       index_column: datetime
@@ -22,6 +26,7 @@ pipeline:
     class: ml4iiot.output.stdoutput.StdOutput
   algorithm:
     class: ml4iiot.algorithms.stochastic.average.Average
-      value_columns:
+    config:
+      columns:
         - sensor_a_value
         - sensor_b_value

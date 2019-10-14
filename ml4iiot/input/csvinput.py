@@ -12,14 +12,36 @@ class CsvInput(AbstractInput):
 
         self.csv_file = None
         self.reader = None
+        self.stop_iteration_raised = False
         self.columns = self.get_config('columns')
         self.index_column = self.get_config('index_column')
 
     def open(self):
         super().open()
 
+        self.stop_iteration_raised = False
         self.csv_file = open(self.get_config('csv_file'))
         self.reader = csv.DictReader(self.csv_file, delimiter=self.get_config('delimiter'))
+
+    def next_data_frame(self, batch_size=1):
+        if self.stop_iteration_raised:
+            # We ran out of values in the previous call, raise exception
+            raise StopIteration
+
+        pandas_dict = {}
+
+        for i in range(0, batch_size):
+            try:
+                row = next(self.reader)
+                self.add_row_to_pandas_dict(pandas_dict, row)
+            except StopIteration:
+                # Catch exception to at least return all rows possible
+                self.stop_iteration_raised = True
+
+        data_frame = pd.DataFrame.from_dict(pandas_dict)
+        data_frame.set_index(self.index_column, inplace=True)
+
+        return data_frame
 
     def datetime_string_to_object(self, datetime_string, datetime_format):
         if datetime_format == 'timestamp':
@@ -28,22 +50,6 @@ class CsvInput(AbstractInput):
             return dateutil.parser.isoparse(datetime_string)
         else:
             return datetime.strptime(datetime_string, datetime_format)
-
-    def next_data_frame(self, recommended_frame_size=None, recommended_end_timestamp=None):
-        pandas_dict = {}
-
-        if recommended_frame_size is not None:
-            for i in range(0, recommended_frame_size):
-                row = next(self.reader)
-                self.add_row_to_pandas_dict(pandas_dict, row)
-        else:
-            row = next(self.reader)
-            self.add_row_to_pandas_dict(pandas_dict, row)
-
-        data_frame = pd.DataFrame.from_dict(pandas_dict)
-        data_frame.set_index(self.index_column, inplace=True)
-
-        return data_frame
 
     def add_row_to_pandas_dict(self, pandas_dict, row):
         for key, value in row.items():

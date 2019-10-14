@@ -10,16 +10,16 @@ python -m virtualenv env;
 source env/bin/activate;
 ```
 
-### Testing
-
-Run unit tests with: `python -m unittest discover tests/*`
-
 ### Install dependencies
 
 ```
 pip install -r requirements.txt;
 pip install -e .;
 ```
+
+### Testing
+
+Run unit tests with: `python -m unittest discover tests/*`
 
 ### Leave virtualenv
 
@@ -29,6 +29,19 @@ pip install -e .;
 
 ```
 python ml4iiot/cli_runner.py -c config/your_config.yaml
+```
+
+## Performance
+
+Resample the training data in advance and use integer timestamps instead of formatted date strings to speed up trainings. 
+Use the following commands to profile your code:
+
+```
+python -m cProfile -o out/cli_runner.profile ml4iiot/cli_runner.py -c config/your_config.yaml
+```
+
+```
+snakeviz out/cli_runner.profile 
 ```
 
 ## Docker
@@ -44,13 +57,17 @@ pipeline:
   input:
     class: ml4iiot.input.csvinput.CsvInput
     config:
-      window_size: 720s
-      stride_size: 360s
-      resample:
-        enabled: True
-        target_sampling_rate: 10s
-        method: interpolate
-        interpolation_method: linear
+      windowing_strategy:
+        class: ml4iiot.input.windowing.timebased.TimeBasedWindowingStrategy
+        config:
+          window_size: 720s
+          stride_size: 360s
+          batch_size: 1000
+          resample:
+            enabled: True
+            target_sampling_rate: 10s
+            method: interpolate
+            interpolation_method: linear
       delimiter: ','
       csv_file: /some/path/to/your/data.csv
       index_column: datetime
@@ -64,6 +81,7 @@ pipeline:
     class: ml4iiot.output.stdoutput.StdOutput
   algorithm:
     class: ml4iiot.algorithms.stochastic.average.Average
+    config:
       columns:
         - sensor_a_value
         - sensor_b_value
@@ -72,6 +90,11 @@ pipeline:
 ### Inputs
 - [ml4iiot.input.csvinput.CsvInput](#CSVInput) 
 - [ml4iiot.input.kafkainput.KafkaInput](#KafkaInput)
+
+#### Windowing strategies
+
+- [ml4iiot.input.timebased.TimeBasedWindowingStrategy](#TimeBasedWindowingStrategy) 
+- [ml4iiot.input.countbased.CountBasedWindowingStrategy](#CountBasedWindowingStrategy) 
 
 ### Outputs
 - [ml4iiot.output.compoundoutput.CompoundOutput](#CompoundOutput)
