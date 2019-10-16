@@ -27,6 +27,10 @@ class AbstractWindowingStrategy(ABC):
             return resampled_batch.ffill()
         elif method == 'bfill':
             return resampled_batch.bfill()
+        elif method == 'mean':
+            interpolation_method = get_recursive_config(resample_config, 'interpolation_method')
+
+            return resampled_batch.mean().interpolate(method=interpolation_method)
         elif method == 'fill_value':
             fill_value = get_recursive_config(resample_config, 'fill_value')
 
