@@ -23,10 +23,29 @@ pipeline:
         sensor_a_value: float
         sensor_b_value: float
   output:
-    class: ml4iiot.output.stdoutput.StdOutput
+    class: ml4iiot.output.compoundoutput.CompoundOutput
+    config:
+      output_adapters:
+        - class: ml4iiot.output.stdoutput.StdOutput
+        - class: ml4iiot.output.plotoutput.PlotOutput
+          config:
+            show_plot: True
+            save_path: ./out/
+            format: svg
+            figures:
+              - save_figure: True
+                plots:
+                  - source: input
+                    column: sensor_a_value
+                    color: '#2A638C'
+                    linestyle: solid
+                  - source: output
+                    column: average_a
+                    color: '#D01431'
+                    linestyle: --
   algorithm:
     class: ml4iiot.algorithms.stochastic.average.Average
     config:
       columns:
-        - sensor_a_value
-        - sensor_b_value
+        sensor_a_value: average_a
+        sensor_b_value: average_b
