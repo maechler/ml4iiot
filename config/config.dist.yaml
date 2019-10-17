@@ -1,6 +1,6 @@
 pipeline:
   input:
-    class: ml4iiot.input.csvinput.CsvInput
+    class: ml4iiot.input.csv.CsvInput
     config:
       windowing_strategy:
         class: ml4iiot.input.windowing.timebased.TimeBasedWindowingStrategy
@@ -23,11 +23,11 @@ pipeline:
         sensor_a_value: float
         sensor_b_value: float
   output:
-    class: ml4iiot.output.compoundoutput.CompoundOutput
+    class: ml4iiot.output.compound.CompoundOutput
     config:
       output_adapters:
-        - class: ml4iiot.output.stdoutput.StdOutput
-        - class: ml4iiot.output.plotoutput.PlotOutput
+        - class: ml4iiot.output.std.StdOutput
+        - class: ml4iiot.output.plot.PlotOutput
           config:
             show_plot: True
             save_path: ./out/

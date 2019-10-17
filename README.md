@@ -55,7 +55,7 @@ A pipeline always consists of an input adapter, an output adapter as well as an 
 ```yaml
 pipeline:
   input:
-    class: ml4iiot.input.csvinput.CsvInput
+    class: ml4iiot.input.csv.CsvInput
     config:
       windowing_strategy:
         class: ml4iiot.input.windowing.timebased.TimeBasedWindowingStrategy
@@ -78,11 +78,11 @@ pipeline:
         sensor_a_value: float
         sensor_b_value: float
   output:
-    class: ml4iiot.output.compoundoutput.CompoundOutput
+    class: ml4iiot.output.compound.CompoundOutput
     config:
       output_adapters:
-        - class: ml4iiot.output.stdoutput.StdOutput
-        - class: ml4iiot.output.plotoutput.PlotOutput
+        - class: ml4iiot.output.std.StdOutput
+        - class: ml4iiot.output.plot.PlotOutput
           config:
             show_plot: True
             save_path: ./out/
@@ -107,8 +107,8 @@ pipeline:
 ```
 
 ### Inputs
-- [ml4iiot.input.csvinput.CsvInput](#CSVInput) 
-- [ml4iiot.input.kafkainput.KafkaInput](#KafkaInput)
+- [ml4iiot.input.csv.CsvInput](#CSVInput) 
+- [ml4iiot.input.kafka.KafkaInput](#KafkaInput)
 
 #### Windowing strategies
 
@@ -116,11 +116,11 @@ pipeline:
 - [ml4iiot.input.countbased.CountBasedWindowingStrategy](#CountBasedWindowingStrategy) 
 
 ### Outputs
-- [ml4iiot.output.compoundoutput.CompoundOutput](#CompoundOutput)
-- [ml4iiot.output.stdoutput.StdOutput](#StdOutput)
-- [ml4iiot.output.plotoutput.PlotOutput](#PlotOutput)
-- [ml4iiot.output.metricoutput.MetricOutput](#MetricOutput)
-- [ml4iiot.output.kafkaoutput.KafkaOutput](#KafkaOutput)
+- [ml4iiot.output.compound.CompoundOutput](#CompoundOutput)
+- [ml4iiot.output.std.StdOutput](#StdOutput)
+- [ml4iiot.output.plot.PlotOutput](#PlotOutput)
+- [ml4iiot.output.metric.MetricOutput](#MetricOutput)
+- [ml4iiot.output.kafka.KafkaOutput](#KafkaOutput)
 
 ### Algorithms
 - [ml4iiot.algorithms.stochastic.average.Average](#Average)
