@@ -23,11 +23,14 @@ def get_absolute_path(path) -> Path:
     return path_obj if path_obj.is_absolute() else get_project_root().joinpath(path_obj)
 
 
-def get_recursive_config(config, *args):
+def get_recursive_config(config, *args, **kwargs):
     for arg in args:
         if arg in config:
             config = config[arg]
         else:
-            raise ValueError('Config with name "' + str(arg) + '" is not set.')
+            if 'default' not in kwargs:
+                raise ValueError('Config with name "' + str(arg) + '" is not set.')
+            else:
+                return kwargs['default']
 
     return config

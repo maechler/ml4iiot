@@ -28,8 +28,8 @@ class AbstractInput(ABC):
     def __iter__(self):
         return self
 
-    def get_config(self, *args):
-        return get_recursive_config(self.config, *args)
+    def get_config(self, *args, **kwargs):
+        return get_recursive_config(self.config, *args, **kwargs)
 
     def next_window(self):
         return self.windowing_strategy.next_window()

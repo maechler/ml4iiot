@@ -126,8 +126,23 @@ pipeline:
 - [ml4iiot.algorithms.stochastic.average.Average](#Average)
 - [ml4iiot.algorithms.stochastic.average_low_high_pass.AverageLowHighPass](#AverageLowHighPass)
 - [ml4iiot.algorithms.stochastic.mad.Mad](#Mad)
-- [ml4iiot.algorithms.autoencoder.shallowautoencoder.ShallowAutoencoder](#ShallowAutoencoder)
+- [ml4iiot.algorithms.autoencoder.fullyconnected.FullyConnectedAutoencoder](#FullyConnectedAutoencoder)
 
 ### CSVInput
 
 ### KafkaInput  
+
+
+### FullyConnectedAutoencoder
+
+```yaml
+    class: ml4iiot.algorithms.autoencoder.fullyconnected.FullyConnectedAutoencoder
+    config:
+      column: sensor_value
+      layer:
+        - dimension: 90
+        - dimension: 70
+        - dimension: 50
+        - dimension: 70
+        - dimension: 90
+```

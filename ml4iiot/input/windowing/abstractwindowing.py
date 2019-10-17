@@ -12,8 +12,8 @@ class AbstractWindowingStrategy(ABC):
     def next_window(self):
         pass
 
-    def get_config(self, *args):
-        return get_recursive_config(self.config, *args)
+    def get_config(self, *args, **kwargs):
+        return get_recursive_config(self.config, *args, **kwargs)
 
     def resample_batch(self, batch, resample_config):
         if not str2bool(get_recursive_config(resample_config, 'enabled')):

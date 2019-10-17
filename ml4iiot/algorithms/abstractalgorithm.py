@@ -13,5 +13,5 @@ class AbstractAlgorithm(ABC):
     def compute(self, input_frame):
         pass
 
-    def get_config(self, *args):
-        return get_recursive_config(self.config, *args)
+    def get_config(self, *args, **kwargs):
+        return get_recursive_config(self.config, *args, **kwargs)
