@@ -56,11 +56,11 @@ class PlotOutput(AbstractOutput):
             plt.show()
 
     def get_save_path_from_figure_config(self, figure_config):
-        file_name = ''
+        file_name = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
 
         for plot_config in figure_config['plots']:
-            file_name += plot_config['column'] + '_'
+            file_name += '_' + plot_config['column']
 
-        figure_path = self.get_config('save_path') + file_name + datetime.now().strftime('%Y_%m_%d_%H_%M_%S') + '.' + self.get_config('format')
+        figure_path = self.get_config('save_path') + file_name + '.' + self.get_config('format')
 
         return get_absolute_path(figure_path)
