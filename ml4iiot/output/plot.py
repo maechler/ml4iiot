@@ -11,6 +11,9 @@ class PlotOutput(AbstractOutput):
         super().__init__(config)
 
         self.figures = []
+        self.format = self.get_config('format', default='svg')
+        self.show_plot = str2bool(self.get_config('show_plot', default=True))
+        self.save_path = self.get_config('save_path', default='./out/')
 
         for figure_config in self.get_config('figures'):
             figure = {'config': figure_config, 'plots': []}
@@ -50,9 +53,9 @@ class PlotOutput(AbstractOutput):
             plt.xticks(rotation=15)
 
             if str2bool(figure['config']['save_figure']):
-                fig.savefig(self.get_save_path_from_figure_config(figure['config']), format=self.get_config('format'))
+                fig.savefig(self.get_save_path_from_figure_config(figure['config']), format=self.format)
 
-        if str2bool(self.get_config('show_plot')):
+        if self.show_plot:
             plt.show()
 
     def get_save_path_from_figure_config(self, figure_config):
@@ -61,6 +64,6 @@ class PlotOutput(AbstractOutput):
         for plot_config in figure_config['plots']:
             file_name += '_' + plot_config['column']
 
-        figure_path = self.get_config('save_path') + file_name + '.' + self.get_config('format')
+        figure_path = self.save_path + file_name + '.' + self.format
 
         return get_absolute_path(figure_path)
