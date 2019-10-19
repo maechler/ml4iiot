@@ -1,6 +1,7 @@
 from datetime import datetime
 from ml4iiot.output.abstractoutput import AbstractOutput
 import matplotlib.pyplot as plt
+import pandas as pd
 from pandas.plotting import register_matplotlib_converters
 from ml4iiot.utility import str2bool, get_absolute_path
 
@@ -10,52 +11,67 @@ class PlotOutput(AbstractOutput):
     def __init__(self, config):
         super().__init__(config)
 
-        self.figures = []
         self.format = self.get_config('format', default='svg')
-        self.show_plot = str2bool(self.get_config('show_plot', default=True))
+        self.show_plots = str2bool(self.get_config('show_plots', default=True))
+        self.save_plots = str2bool(self.get_config('save_plots', default=True))
         self.save_path = self.get_config('save_path', default='./out/')
 
+        self.columns_to_plot = []
+        self.accumulated_data_frame = None
+
         for figure_config in self.get_config('figures'):
-            figure = {'config': figure_config, 'plots': []}
-
             for plot_config in figure_config['plots']:
-                figure['plots'].append({'config': plot_config, 'data': {}})
+                self.columns_to_plot.append(plot_config['column'])
 
-            self.figures.append(figure)
+    def init(self):
+        super().init()
 
-    def open(self):
-        super().open()
+    def process(self, data_frame):
+        data_frame_copy = data_frame.copy()
 
-    def emit(self, input_frame, output_frame):
-        for figure in self.figures:
-            for plot in figure['plots']:
-                source = input_frame if plot['config']['source'] == 'input' else output_frame
+        if self.accumulated_data_frame is None:
+            self.accumulated_data_frame = pd.DataFrame(index=data_frame_copy.index)
 
-                plot['data'].update(source[plot['config']['column']].dropna().to_dict())
+        for column_name, column_data in data_frame_copy.iteritems():
+            if column_name not in self.columns_to_plot:
+                del data_frame_copy[column_name]
 
-    def close(self):
-        super().close()
+        self.accumulated_data_frame = self.accumulated_data_frame.combine_first(data_frame_copy)
+
+    def destroy(self):
+        super().destroy()
         register_matplotlib_converters()
 
-        for figure in self.figures:
-            fig = plt.figure()
+        for figure_config in self.get_config('figures'):
+            fig, ax = plt.subplots()
 
-            for plot in figure['plots']:
-                plt.plot(
-                    plot['data'].keys(),
-                    plot['data'].values(),
-                    color=plot['config']['color'],
-                    label=plot['config']['column'],
-                    linestyle=plot['config']['linestyle']
+            for plot_config in figure_config['plots']:
+                sanitized_column = self.accumulated_data_frame[plot_config['column']].dropna()
+
+                ax.plot(
+                    sanitized_column.index,
+                    sanitized_column.values,
+                    color=plot_config['color'],
+                    label=plot_config['column'],
+                    linestyle=plot_config['linestyle']
                 )
 
             plt.legend(loc='best')
-            plt.xticks(rotation=15)
+            fig.autofmt_xdate()
 
-            if str2bool(figure['config']['save_figure']):
-                fig.savefig(self.get_save_path_from_figure_config(figure['config']), format=self.format)
+            if 'xlabel' in figure_config:
+                ax.set_xlabel(figure_config['xlabel'])
 
-        if self.show_plot:
+            if 'ylabel' in figure_config:
+                ax.set_ylabel(figure_config['ylabel'])
+
+            if 'title' in figure_config:
+                ax.set_title(figure_config['title'])
+
+            if self.save_plots:
+                fig.savefig(self.get_save_path_from_figure_config(figure_config), format=self.format)
+
+        if self.show_plots:
             plt.show()
 
     def get_save_path_from_figure_config(self, figure_config):
