@@ -25,7 +25,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-c', '--config_path', help='Path to a config file.', type=str, required=True)
-    parser.add_argument('-f', '--format', help='Format of the config file.', type=str, required=True, default='yaml')
+    parser.add_argument('-f', '--format', help='Format of the config file.', type=str, default='yaml')
 
     args = parser.parse_args()
 

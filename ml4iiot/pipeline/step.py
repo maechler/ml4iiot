@@ -2,15 +2,20 @@ from abc import ABC, abstractmethod
 from ml4iiot.utility import get_recursive_config
 
 
-class AbstractAlgorithm(ABC):
-
+class AbstractStep(ABC):
     def __init__(self, config):
         super().__init__()
 
         self.config = config
 
+    def init(self):
+        pass
+
+    def destroy(self):
+        pass
+
     @abstractmethod
-    def compute(self, input_frame):
+    def process(self, data_frame):
         pass
 
     def get_config(self, *args, **kwargs):

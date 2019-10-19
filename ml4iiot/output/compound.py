@@ -12,18 +12,18 @@ class CompoundOutput(AbstractOutput):
         for output_config in self.get_config('output_adapters'):
             self.output_adapters.append(instance_from_config(output_config))
 
-    def open(self):
-        super().open()
+    def init(self):
+        super().init()
 
         for output_adapter in self.output_adapters:
-            output_adapter.open()
+            output_adapter.init()
 
-    def emit(self, input_frame, output_frame):
+    def process(self, data_frame):
         for output_adapter in self.output_adapters:
-            output_adapter.emit(input_frame, output_frame)
+            output_adapter.process(data_frame)
 
-    def close(self):
-        super().close()
+    def destroy(self):
+        super().destroy()
 
         for output_adapter in self.output_adapters:
-            output_adapter.close()
+            output_adapter.destroy()

@@ -22,6 +22,18 @@ pipeline:
           datetime_format: 'iso'
         sensor_a_value: float
         sensor_b_value: float
+
+  preprocessing:
+
+  algorithm:
+    class: ml4iiot.algorithms.stochastic.average.Average
+    config:
+      columns:
+        sensor_a_value: average_a
+        sensor_b_value: average_b
+
+  postprocessing:
+
   output:
     class: ml4iiot.output.compound.CompoundOutput
     config:
@@ -43,9 +55,3 @@ pipeline:
                     column: average_a
                     color: '#D01431'
                     linestyle: --
-  algorithm:
-    class: ml4iiot.algorithms.stochastic.average.Average
-    config:
-      columns:
-        sensor_a_value: average_a
-        sensor_b_value: average_b

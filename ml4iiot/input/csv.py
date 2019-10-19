@@ -16,8 +16,8 @@ class CsvInput(AbstractInput):
         self.columns = self.get_config('columns')
         self.index_column = self.get_config('index_column')
 
-    def open(self):
-        super().open()
+    def init(self):
+        super().init()
 
         self.stop_iteration_raised = False
         self.csv_file = open(self.get_config('csv_file'))
@@ -85,7 +85,7 @@ class CsvInput(AbstractInput):
         else:
             my_dict[key].append(value)
 
-    def close(self):
-        super().close()
+    def destroy(self):
+        super().destroy()
 
         self.csv_file.close()

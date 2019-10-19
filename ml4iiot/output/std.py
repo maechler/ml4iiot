@@ -9,10 +9,9 @@ class StdOutput(AbstractOutput):
         super().__init__(config)
 
         self.show_columns_progress = self.get_config('show_columns_progress', default=[])
-        self.show_input = str2bool(self.get_config('show_input', default=False))
-        self.show_output = str2bool(self.get_config('show_output', default=False))
+        self.show_data_frame = str2bool(self.get_config('show_data_frame', default=False))
 
-    def emit(self, input_frame, output_frame):
+    def process(self, data_frame):
         output = ''
         progress_output = []
 
@@ -20,18 +19,14 @@ class StdOutput(AbstractOutput):
             output += '\r'
 
         for progress_config in self.show_columns_progress:
-            source = input_frame if progress_config['source'] == 'input' else output_frame
             column_name = progress_config['column']
-            value = source.index[-1] if column_name == 'index' else source[column_name][-1]
+            value = data_frame.index[-1] if column_name == 'index' else data_frame[column_name][-1]
 
             progress_output.append('{0}={1}'.format(column_name, value))
 
         output += ', '.join(progress_output)
 
-        if self.show_input:
-            output += str(input_frame) + '\n'
-
-        if self.show_output:
-            output += str(output_frame) + '\n'
+        if self.show_data_frame:
+            output += str(data_frame) + '\n'
 
         sys.stdout.write(output)

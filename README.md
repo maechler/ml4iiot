@@ -99,7 +99,7 @@ pipeline:
                     color: '#D01431'
                     linestyle: --
   algorithm:
-    class: ml4iiot.algorithms.stochastic.average.Average
+    class: ml4iiot.algorithm.stochastic.average.Average
     config:
       columns:
         sensor_a_value: average_a
@@ -123,10 +123,10 @@ pipeline:
 - [ml4iiot.output.kafka.KafkaOutput](#KafkaOutput)
 
 ### Algorithms
-- [ml4iiot.algorithms.stochastic.average.Average](#Average)
-- [ml4iiot.algorithms.stochastic.average_low_high_pass.AverageLowHighPass](#AverageLowHighPass)
-- [ml4iiot.algorithms.stochastic.mad.Mad](#Mad)
-- [ml4iiot.algorithms.autoencoder.fullyconnected.FullyConnectedAutoencoder](#FullyConnectedAutoencoder)
+- [ml4iiot.algorithm.stochastic.average.Average](#Average)
+- [ml4iiot.algorithm.stochastic.average_low_high_pass.AverageLowHighPass](#AverageLowHighPass)
+- [ml4iiot.algorithm.stochastic.mad.Mad](#Mad)
+- [ml4iiot.algorithm.autoencoder.fullyconnected.FullyConnectedAutoencoder](#FullyConnectedAutoencoder)
 
 ### CSVInput
 
@@ -136,7 +136,7 @@ pipeline:
 ### FullyConnectedAutoencoder
 
 ```yaml
-    class: ml4iiot.algorithms.autoencoder.fullyconnected.FullyConnectedAutoencoder
+    class: ml4iiot.algorithm.autoencoder.fullyconnected.FullyConnectedAutoencoder
     config:
       column: sensor_value
       layer:
