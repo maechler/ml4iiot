@@ -36,11 +36,11 @@ class TestAbstractInputWithResample(unittest.TestCase):
             'method': 'ffill',
         }
         test_input_1 = self.create_test_input('10s', '1s', resample, test_data)
-        batch_1 = test_input_1.next_window()
+        batch_1 = next(test_input_1)
         test_input_2 = self.create_test_input('20s', '1s', resample, test_data)
-        batch_2 = test_input_2.next_window()
+        batch_2 = next(test_input_2)
         test_input_3 = self.create_test_input('40s', '1s', resample, test_data)
-        batch_3 = test_input_3.next_window()
+        batch_3 = next(test_input_3)
 
         self.assertEqual(2, len(batch_1))
         self.assertEqual(3, len(batch_2))
@@ -60,9 +60,9 @@ class TestAbstractInputWithResample(unittest.TestCase):
         ]
         test_input = self.create_test_input(window_size, stride_size, resample, test_data)
 
-        test_input.next_window()
+        next(test_input)
 
-        self.assertRaises(StopIteration, test_input.next_window)
+        self.assertRaises(StopIteration, test_input.__next__)
 
     def test_stride_smaller_than_window(self):
         window_size = '30s'
@@ -83,17 +83,17 @@ class TestAbstractInputWithResample(unittest.TestCase):
 
         test_input = self.create_test_input(window_size, stride_size, resample, test_data)
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(4, len(batch))
         self.assertEqual([0, 1, 2, 3], batch['value'].tolist())
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(4, len(batch))
         self.assertEqual([1, 2, 3, 4], batch['value'].tolist())
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(4, len(batch))
         self.assertEqual([2, 3, 4, 5], batch['value'].tolist())
@@ -118,17 +118,17 @@ class TestAbstractInputWithResample(unittest.TestCase):
 
         test_input = self.create_test_input(window_size, stride_size, resample, test_data)
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(3, len(batch))
         self.assertEqual([0, 1, 2], batch['value'].tolist())
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(3, len(batch))
         self.assertEqual([2, 3, 4], batch['value'].tolist())
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(3, len(batch))
         self.assertEqual([4, 5, 6], batch['value'].tolist())
@@ -154,17 +154,17 @@ class TestAbstractInputWithResample(unittest.TestCase):
 
         test_input = self.create_test_input(window_size, stride_size, resample, test_data)
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(2, len(batch))
         self.assertEqual([0, 1], batch['value'].tolist())
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(2, len(batch))
         self.assertEqual([3, 4], batch['value'].tolist())
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(2, len(batch))
         self.assertEqual([6, 7], batch['value'].tolist())
@@ -185,7 +185,7 @@ class TestAbstractInputWithResample(unittest.TestCase):
 
         test_input = self.create_test_input(window_size, stride_size, resample, test_data)
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(6, len(batch))
         self.assertEqual([0, 0, 0, 3, 3, 5], batch['value'].tolist())
@@ -206,7 +206,7 @@ class TestAbstractInputWithResample(unittest.TestCase):
 
         test_input = self.create_test_input(window_size, stride_size, resample, test_data)
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(6, len(batch))
         self.assertEqual([0, 3, 3, 3, 5, 5], batch['value'].tolist())
@@ -228,7 +228,7 @@ class TestAbstractInputWithResample(unittest.TestCase):
 
         test_input = self.create_test_input(window_size, stride_size, resample, test_data)
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(11, len(batch))
         self.assertEqual([0, 1, 2, 3, 4, 4.5, 5, 5.5, 6, 6.5, 7], batch['value'].tolist())
@@ -250,7 +250,7 @@ class TestAbstractInputWithResample(unittest.TestCase):
 
         test_input = self.create_test_input(window_size, stride_size, resample, test_data)
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(11, len(batch))
         self.assertEqual([0, -1, -1, -1, 4, -1, -1, -1, -1, -1, 7], batch['value'].tolist())
@@ -271,7 +271,7 @@ class TestAbstractInputWithResample(unittest.TestCase):
 
         test_input = self.create_test_input(window_size, stride_size, resample, test_data)
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(11, len(batch))
         self.assertEqual([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50], list(map(lambda element: element.timestamp(), batch.index.tolist())))
@@ -294,7 +294,7 @@ class TestAbstractInputWithResample(unittest.TestCase):
 
         test_input = self.create_test_input(window_size, stride_size, resample, test_data)
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(4, len(batch))
         self.assertEqual([0, 20, 40, 60], list(map(lambda element: element.timestamp(), batch.index.tolist())))
@@ -317,25 +317,25 @@ class TestAbstractInputWithResample(unittest.TestCase):
 
         test_input = self.create_test_input(window_size, stride_size, resample, test_data)
 
-        batch_1 = test_input.next_window()
+        batch_1 = next(test_input)
 
         self.assertEqual(5, len(batch_1))
         self.assertEqual([0, 10, 20, 30, 40], list(map(lambda element: element.timestamp(), batch_1.index.tolist())))
         self.assertEqual([0, 1, 2, 3, 4], batch_1['value'].tolist())
 
-        batch_2 = test_input.next_window()
+        batch_2 = next(test_input)
 
         self.assertEqual(5, len(batch_2))
         self.assertEqual([20, 30, 40, 50, 60], list(map(lambda element: element.timestamp(), batch_2.index.tolist())))
         self.assertEqual([2, 3, 4, 5, 6], batch_2['value'].tolist())
 
-        batch_3 = test_input.next_window()
+        batch_3 = next(test_input)
 
         self.assertEqual(5, len(batch_3))
         self.assertEqual([40, 50, 60, 70, 80], list(map(lambda element: element.timestamp(), batch_3.index.tolist())))
         self.assertEqual([4, 5, 6, 7, 8], batch_3['value'].tolist())
 
-        batch_4 = test_input.next_window()
+        batch_4 = next(test_input)
 
         self.assertEqual(5, len(batch_4))
         self.assertEqual([60, 70, 80, 90, 100], list(map(lambda element: element.timestamp(), batch_4.index.tolist())))
@@ -363,31 +363,31 @@ class TestAbstractInputWithResample(unittest.TestCase):
 
         test_input = self.create_test_input(window_size, stride_size, resample, test_data)
 
-        batch_1 = test_input.next_window()
+        batch_1 = next(test_input)
 
         self.assertEqual(9, len(batch_1))
         self.assertEqual([0, 5, 10, 15, 20, 25, 30, 35, 40], list(map(lambda element: element.timestamp(), batch_1.index.tolist())))
         self.assertEqual([0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4], batch_1['value'].tolist())
 
-        batch_2 = test_input.next_window()
+        batch_2 = next(test_input)
 
         self.assertEqual(9, len(batch_2))
         self.assertEqual([20, 25, 30, 35, 40, 45, 50, 55, 60], list(map(lambda element: element.timestamp(), batch_2.index.tolist())))
         self.assertEqual([2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6], batch_2['value'].tolist())
 
-        batch_3 = test_input.next_window()
+        batch_3 = next(test_input)
 
         self.assertEqual(9, len(batch_3))
         self.assertEqual([40, 45, 50, 55, 60, 65, 70, 75, 80], list(map(lambda element: element.timestamp(), batch_3.index.tolist())))
         self.assertEqual([4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8], batch_3['value'].tolist())
 
-        batch_4 = test_input.next_window()
+        batch_4 = next(test_input)
 
         self.assertEqual(9, len(batch_4))
         self.assertEqual([60, 65, 70, 75, 80, 85, 90, 95, 100], list(map(lambda element: element.timestamp(), batch_4.index.tolist())))
         self.assertEqual([6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10], batch_4['value'].tolist())
 
-        self.assertRaises(StopIteration, test_input.next_window)
+        self.assertRaises(StopIteration, test_input.__next__)
 
 
 if __name__ == '__main__':

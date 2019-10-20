@@ -64,11 +64,11 @@ class TestAbstractInputWithoutResample(unittest.TestCase):
         ]
 
         test_input_1 = self.create_test_input(1, 1, test_data)
-        batch_1 = test_input_1.next_window()
+        batch_1 = next(test_input_1)
         test_input_2 = self.create_test_input(2, 1, test_data)
-        batch_2 = test_input_2.next_window()
+        batch_2 = next(test_input_2)
         test_input_9 = self.create_test_input(9, 1, test_data)
-        batch_9 = test_input_9.next_window()
+        batch_9 = next(test_input_9)
 
         self.assertEqual(1, len(batch_1))
         self.assertEqual(2, len(batch_2))
@@ -91,17 +91,17 @@ class TestAbstractInputWithoutResample(unittest.TestCase):
 
         test_input = self.create_test_input(window_size, stride_size, test_data)
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(window_size, len(batch))
         self.assertEqual([1, 2], batch['value'].tolist())
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(window_size, len(batch))
         self.assertEqual([2, 3], batch['value'].tolist())
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(window_size, len(batch))
         self.assertEqual([3, 4], batch['value'].tolist())
@@ -123,17 +123,17 @@ class TestAbstractInputWithoutResample(unittest.TestCase):
 
         test_input = self.create_test_input(window_size, stride_size, test_data)
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(window_size, len(batch))
         self.assertEqual([1, 2], batch['value'].tolist())
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(window_size, len(batch))
         self.assertEqual([3, 4], batch['value'].tolist())
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(window_size, len(batch))
         self.assertEqual([5, 6], batch['value'].tolist())
@@ -155,17 +155,17 @@ class TestAbstractInputWithoutResample(unittest.TestCase):
 
         test_input = self.create_test_input(window_size, stride_size, test_data)
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(window_size, len(batch))
         self.assertEqual([1], batch['value'].tolist())
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(window_size, len(batch))
         self.assertEqual([4], batch['value'].tolist())
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(window_size, len(batch))
         self.assertEqual([7], batch['value'].tolist())
@@ -179,9 +179,9 @@ class TestAbstractInputWithoutResample(unittest.TestCase):
         ]
         test_input = self.create_test_input(window_size, stride_size, test_data)
 
-        test_input.next_window()
+        next(test_input)
 
-        self.assertRaises(StopIteration, test_input.next_window)
+        self.assertRaises(StopIteration, test_input.__next__)
 
     def test_bigger_batch_size(self):
         window_size = 1
@@ -201,17 +201,17 @@ class TestAbstractInputWithoutResample(unittest.TestCase):
 
         test_input = self.create_test_input(window_size, stride_size, test_data, batch_size)
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(window_size, len(batch))
         self.assertEqual([1], batch['value'].tolist())
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(window_size, len(batch))
         self.assertEqual([4], batch['value'].tolist())
 
-        batch = test_input.next_window()
+        batch = next(test_input)
 
         self.assertEqual(window_size, len(batch))
         self.assertEqual([7], batch['value'].tolist())
