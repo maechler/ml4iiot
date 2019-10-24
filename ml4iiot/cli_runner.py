@@ -4,17 +4,14 @@ import json
 from ml4iiot.pipeline.pipeline import Pipeline
 
 
-def run(config_path, format):
-    if format == 'yaml':
-        config_file = open(config_path)
-        config = yaml.load(config_file, Loader=yaml.FullLoader)
-        config_file.close()
-    elif format == 'json':
-        config_file = open(config_path)
-        config = json.load(config_file)
-        config_file.close()
-    else:
-        raise ValueError('Config format "{0}" is not supported.'.format(format))
+def run(config_path, config_format):
+    with open(config_path) as config_file:
+        if config_format == 'yaml':
+            config = yaml.load(config_file, Loader=yaml.FullLoader)
+        elif config_format == 'json':
+            config = json.load(config_file)
+        else:
+            raise ValueError('Config format "{0}" is not supported.'.format(config_format))
 
     pipeline = Pipeline(config['pipeline'])
 
