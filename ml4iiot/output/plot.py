@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import pickle
 from pandas.plotting import register_matplotlib_converters
-from ml4iiot.utility import str2bool, get_absolute_path
+from ml4iiot.utility import str2bool, get_absolute_path, get_recursive_config
 
 
 class PlotOutput(AbstractOutput):
@@ -53,9 +53,10 @@ class PlotOutput(AbstractOutput):
                 ax.plot(
                     sanitized_column.index,
                     sanitized_column.values,
-                    color=plot_config['color'],
+                    color=get_recursive_config(plot_config, 'color', default='#2A638C'),
                     label=plot_config['column'],
-                    linestyle=plot_config['linestyle']
+                    linestyle=get_recursive_config(plot_config, 'linestyle', default='solid'),
+                    marker=get_recursive_config(plot_config, 'marker', default=None)
                 )
 
             plt.legend(loc='best')
