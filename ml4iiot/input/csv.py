@@ -45,7 +45,7 @@ class CsvInput(AbstractInput):
 
     def datetime_string_to_object(self, datetime_string, datetime_format):
         if datetime_format == 'timestamp':
-            return datetime.fromtimestamp(datetime_string)
+            return datetime.fromtimestamp(float(datetime_string))
         elif datetime_format == 'iso':
             return dateutil.parser.isoparse(datetime_string)
         else:
@@ -53,6 +53,9 @@ class CsvInput(AbstractInput):
 
     def add_row_to_pandas_dict(self, pandas_dict, row):
         for key, value in row.items():
+            if key not in self.columns:
+                continue
+
             if self.get_column_type(key) == 'datetime':
                 self.append_value_to_dict(
                     pandas_dict,
