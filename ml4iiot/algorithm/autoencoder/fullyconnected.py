@@ -1,6 +1,6 @@
 from keras import Input, Model
 from keras.layers import Dense
-from ml4iiot.algorithms.autoencoder.abstractautoencoder import AbstractAutoencoder
+from ml4iiot.algorithm.autoencoder.abstractautoencoder import AbstractAutoencoder
 
 
 class FullyConnectedAutoencoder(AbstractAutoencoder):
