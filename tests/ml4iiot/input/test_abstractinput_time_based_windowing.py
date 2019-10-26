@@ -7,7 +7,7 @@ class TestAbstractInputWithResample(unittest.TestCase):
     def create_test_input(self, window_size, stride_size, resample, test_data, batch_size=1):
         config = {
             'windowing_strategy': {
-                'class': 'ml4iiot.input.windowing.timebased.TimeBasedWindowingStrategy',
+                'class': 'ml4iiot.input.windowing.TimeBasedWindowingStrategy',
                 'config': {
                     'batch_size': batch_size,
                     'window_size': window_size,

@@ -37,7 +37,7 @@ class TestAbstractInputWithoutResample(unittest.TestCase):
     def create_test_input(self, window_size, stride_size, test_data, batch_size=1):
         config = {
             'windowing_strategy': {
-                'class': 'ml4iiot.input.windowing.countbased.CountBasedWindowingStrategy',
+                'class': 'ml4iiot.input.windowing.CountBasedWindowingStrategy',
                 'config': {
                     'batch_size': batch_size,
                     'window_size': window_size,
