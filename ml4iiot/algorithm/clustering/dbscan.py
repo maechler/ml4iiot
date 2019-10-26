@@ -1,3 +1,4 @@
+from pandas import DataFrame
 from ml4iiot.algorithm.abstractalgorithm import AbstractAlgorithm
 from sklearn.cluster import DBSCAN as SkDBSCAN
 import numpy as np
@@ -5,7 +6,7 @@ import numpy as np
 
 class DBSCAN(AbstractAlgorithm):
 
-    def __init__(self, config):
+    def __init__(self, config: dict):
         super().__init__(config)
 
         self.epsilon = self.get_config('epsilon')
@@ -13,7 +14,7 @@ class DBSCAN(AbstractAlgorithm):
         self.source_column = self.get_config('source_column')
         self.db = SkDBSCAN(eps=self.epsilon, min_samples=self.min_samples)
 
-    def process(self, data_frame):
+    def process(self, data_frame: DataFrame) -> None:
         reshaped = np.array(data_frame[self.source_column].values).reshape(-1, 1)
 
         self.db.fit(reshaped)

@@ -1,3 +1,4 @@
+from pandas import DataFrame
 from ml4iiot.algorithm.abstractalgorithm import AbstractAlgorithm
 
 
@@ -8,7 +9,7 @@ class Average(AbstractAlgorithm):
 
         self.column_mapping = self.get_config('column_mapping')
 
-    def process(self, data_frame):
+    def process(self, data_frame: DataFrame) -> None:
         for source_column, target_column in self.column_mapping.items():
             data_frame[target_column] = float('nan')
 

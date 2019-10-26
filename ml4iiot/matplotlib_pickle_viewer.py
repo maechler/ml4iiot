@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 
 
-def run(pickle_file_path):
+def run(pickle_file_path: str) -> None:
     register_matplotlib_converters()
 
     with open(pickle_file_path, 'rb') as pickle_file:

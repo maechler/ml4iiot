@@ -1,4 +1,6 @@
 from datetime import datetime
+from matplotlib.path import Path
+from pandas import DataFrame
 from ml4iiot.output.abstractoutput import AbstractOutput
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -25,10 +27,7 @@ class PlotOutput(AbstractOutput):
             for plot_config in figure_config['plots']:
                 self.columns_to_plot.append(plot_config['column'])
 
-    def init(self):
-        super().init()
-
-    def process(self, data_frame):
+    def process(self, data_frame: DataFrame) -> None:
         data_frame_copy = data_frame.copy()
 
         if self.accumulated_data_frame is None:
@@ -40,7 +39,7 @@ class PlotOutput(AbstractOutput):
 
         self.accumulated_data_frame = self.accumulated_data_frame.combine_first(data_frame_copy)
 
-    def destroy(self):
+    def destroy(self) -> None:
         super().destroy()
         register_matplotlib_converters()
 
@@ -84,7 +83,7 @@ class PlotOutput(AbstractOutput):
         if self.show_plots:
             plt.show()
 
-    def get_save_path_from_figure_config(self, figure_config, file_extension=''):
+    def get_save_path_from_figure_config(self, figure_config: dict, file_extension: str = '') -> Path:
         file_name = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
 
         for plot_config in figure_config['plots']:

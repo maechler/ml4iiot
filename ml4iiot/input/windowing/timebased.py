@@ -1,4 +1,5 @@
 import datetime
+from pandas import DataFrame
 from ml4iiot.input.windowing.abstractwindowing import AbstractWindowingStrategy
 
 
@@ -15,7 +16,7 @@ class TimeBasedWindowingStrategy(AbstractWindowingStrategy):
         self.window_size_time_delta = self.size_to_timedelta(self.get_config('window_size'))
         self.stride_size_time_delta = self.size_to_timedelta(self.get_config('stride_size'))
 
-    def next_window(self):
+    def next_window(self) -> DataFrame:
         if self.running_data_frame is None:
             self.running_data_frame = self.input.next_data_frame(batch_size=1)
             window_start_timestamp = self.running_data_frame.index[0]
@@ -36,7 +37,7 @@ class TimeBasedWindowingStrategy(AbstractWindowingStrategy):
 
         return selected_window
 
-    def size_to_timedelta(self, size):
+    def size_to_timedelta(self, size: str) -> datetime.timedelta:
         int_size = int(size.rstrip('ms'))
         timedelta_milliseconds = int_size if 'ms' in size else 1000 * int_size
 

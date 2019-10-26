@@ -22,7 +22,7 @@ class Pipeline:
 
         self.steps.append(self.output)
 
-    def run(self):
+    def run(self) -> None:
         for step in self.steps:
             step.init()
 

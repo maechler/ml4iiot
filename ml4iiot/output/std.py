@@ -1,5 +1,6 @@
-from ml4iiot.output.abstractoutput import AbstractOutput
 import sys
+from pandas import DataFrame
+from ml4iiot.output.abstractoutput import AbstractOutput
 from ml4iiot.utility import str2bool
 
 
@@ -11,7 +12,7 @@ class StdOutput(AbstractOutput):
         self.show_columns_progress = self.get_config('show_columns_progress', default=[])
         self.show_data_frame = str2bool(self.get_config('show_data_frame', default=False))
 
-    def process(self, data_frame):
+    def process(self, data_frame: DataFrame) -> None:
         output = ''
         progress_output = []
 

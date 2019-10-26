@@ -1,3 +1,4 @@
+from pandas import DataFrame
 from ml4iiot.input.windowing.abstractwindowing import AbstractWindowingStrategy
 
 
@@ -13,7 +14,7 @@ class CountBasedWindowingStrategy(AbstractWindowingStrategy):
         self.running_data_frame = None
         self.previous_start_index = None
 
-    def next_window(self):
+    def next_window(self) -> DataFrame:
         if self.running_data_frame is None:
             self.running_data_frame = self.input.next_data_frame(batch_size=1)
             previous_start_iloc = None

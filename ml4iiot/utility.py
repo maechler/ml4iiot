@@ -1,12 +1,13 @@
 import importlib
 from pathlib import Path
+from typing import Union
 
 
-def str2bool(v):
+def str2bool(v) -> bool:
     return str(v).lower() in ('yes', 'true', '1')
 
 
-def instance_from_config(config):
+def instance_from_config(config: dict) -> any:
     module_name, class_name = config['class'].rsplit('.', 1)
     class_config = config['config'] if 'config' in config else {}
 
@@ -17,13 +18,13 @@ def get_project_root() -> Path:
     return Path(__file__).parent.parent
 
 
-def get_absolute_path(path) -> Path:
+def get_absolute_path(path: Union[Path,str]) -> Path:
     path_obj = Path(path)
 
     return path_obj if path_obj.is_absolute() else get_project_root().joinpath(path_obj)
 
 
-def get_recursive_config(config, *args, **kwargs):
+def get_recursive_config(config: dict, *args, **kwargs):
     for arg in args:
         if arg in config:
             config = config[arg]

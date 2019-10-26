@@ -1,3 +1,4 @@
+from pandas import DataFrame
 from ml4iiot.input.abstractinput import AbstractInput
 from datetime import datetime
 import dateutil.parser
@@ -16,14 +17,14 @@ class CsvInput(AbstractInput):
         self.columns = self.get_config('columns')
         self.index_column = self.get_config('index_column')
 
-    def init(self):
+    def init(self) -> None:
         super().init()
 
         self.stop_iteration_raised = False
         self.csv_file = open(self.get_config('csv_file'))
         self.reader = csv.DictReader(self.csv_file, delimiter=self.get_config('delimiter'))
 
-    def next_data_frame(self, batch_size=1):
+    def next_data_frame(self, batch_size: int = 1) -> DataFrame:
         if self.stop_iteration_raised:
             # We ran out of values in the previous call, raise exception
             raise StopIteration
@@ -43,7 +44,7 @@ class CsvInput(AbstractInput):
 
         return data_frame
 
-    def datetime_string_to_object(self, datetime_string, datetime_format):
+    def datetime_string_to_object(self, datetime_string: str, datetime_format: str) -> datetime:
         if datetime_format == 'timestamp':
             return datetime.fromtimestamp(float(datetime_string))
         elif datetime_format == 'iso':
@@ -51,7 +52,7 @@ class CsvInput(AbstractInput):
         else:
             return datetime.strptime(datetime_string, datetime_format)
 
-    def add_row_to_pandas_dict(self, pandas_dict, row):
+    def add_row_to_pandas_dict(self, pandas_dict: dict, row: dict) -> None:
         for key, value in row.items():
             if key not in self.columns:
                 continue
@@ -71,7 +72,7 @@ class CsvInput(AbstractInput):
             else:
                 self.append_value_to_dict(pandas_dict, key, value)
 
-    def get_column_type(self, column_name):
+    def get_column_type(self, column_name: str) -> str:
         column_config = self.columns[column_name]
         column_type = column_config if type(column_config) is str else column_config['type']
 
@@ -82,13 +83,13 @@ class CsvInput(AbstractInput):
         else:
             return column_type
 
-    def append_value_to_dict(self, my_dict, key, value):
+    def append_value_to_dict(self, my_dict: dict, key: str, value) -> None:
         if key not in my_dict:
             my_dict[key] = [value]
         else:
             my_dict[key].append(value)
 
-    def destroy(self):
+    def destroy(self) -> None:
         super().destroy()
 
         self.csv_file.close()

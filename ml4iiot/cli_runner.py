@@ -4,7 +4,7 @@ import json
 from ml4iiot.pipeline.pipeline import Pipeline
 
 
-def run(config_path, config_format):
+def run(config_path: str, config_format: str) -> None:
     with open(config_path) as config_file:
         if config_format == 'yaml':
             config = yaml.load(config_file, Loader=yaml.FullLoader)

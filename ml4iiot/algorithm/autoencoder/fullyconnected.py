@@ -5,7 +5,7 @@ from ml4iiot.algorithm.autoencoder.abstractautoencoder import AbstractAutoencode
 
 class FullyConnectedAutoencoder(AbstractAutoencoder):
 
-    def create_autoencoder_model(self):
+    def create_autoencoder_model(self) -> Model:
         layer_config = self.get_config('layer')
         input_layer_config = layer_config[0]
         output_layer_config = layer_config[-1]

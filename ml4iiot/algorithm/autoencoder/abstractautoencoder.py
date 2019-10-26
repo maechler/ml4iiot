@@ -1,16 +1,15 @@
 from abc import abstractmethod
 import numpy as np
+from keras import Model
+from pandas import DataFrame
 from ml4iiot.algorithm.abstractalgorithm import AbstractAlgorithm
-import pandas as pd
 from ml4iiot.utility import str2bool
 
 
 class AbstractAutoencoder(AbstractAlgorithm):
 
-    def __init__(self, config):
+    def __init__(self, config: dict):
         super().__init__(config)
-
-        pd.options.mode.chained_assignment = None
 
         self.verbose = str2bool(self.get_config('verbose', default=False))
         self.autoencoder = self.create_autoencoder_model()
@@ -24,13 +23,13 @@ class AbstractAutoencoder(AbstractAlgorithm):
             self.autoencoder.summary()
 
     @abstractmethod
-    def create_autoencoder_model(self):
+    def create_autoencoder_model(self) -> Model:
         pass
 
-    def do_fit(self, data_frame):
+    def do_fit(self, data_frame: DataFrame) -> bool:
         return True
 
-    def process(self, data_frame):
+    def process(self, data_frame: DataFrame) -> None:
         normalized_input = np.array([data_frame[self.get_config('input')]])
 
         normalized_reconstruction = self.autoencoder.predict(normalized_input)

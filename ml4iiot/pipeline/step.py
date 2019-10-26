@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from pandas import DataFrame
 from ml4iiot.utility import get_recursive_config
 
 
@@ -8,14 +9,14 @@ class AbstractStep(ABC):
 
         self.config = config
 
-    def init(self):
+    def init(self) -> None:
         pass
 
-    def destroy(self):
+    def destroy(self) -> None:
         pass
 
     @abstractmethod
-    def process(self, data_frame):
+    def process(self, data_frame: DataFrame) -> None:
         pass
 
     def get_config(self, *args, **kwargs):
