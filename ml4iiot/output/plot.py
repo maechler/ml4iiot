@@ -47,6 +47,9 @@ class PlotOutput(AbstractOutput):
             fig, ax = plt.subplots()
 
             for plot_config in figure_config['plots']:
+                if not plot_config['column'] in self.accumulated_data_frame:
+                    continue
+
                 sanitized_column = self.accumulated_data_frame[plot_config['column']].dropna()
 
                 ax.plot(

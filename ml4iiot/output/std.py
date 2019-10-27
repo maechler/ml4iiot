@@ -21,9 +21,10 @@ class StdOutput(AbstractOutput):
 
         for progress_config in self.show_columns_progress:
             column_name = progress_config['column']
-            value = data_frame.index[-1] if column_name == 'index' else data_frame[column_name][-1]
 
-            progress_output.append('{0}={1}'.format(column_name, value))
+            if column_name == 'index' or column_name in data_frame:
+                value = data_frame.index[-1] if column_name == 'index' else data_frame[column_name][-1]
+                progress_output.append('{0}={1}'.format(column_name, value))
 
         output += ', '.join(progress_output)
 
