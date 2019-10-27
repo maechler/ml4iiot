@@ -15,6 +15,9 @@ class DBSCAN(AbstractAlgorithm):
         self.db = SkDBSCAN(eps=self.epsilon, min_samples=self.min_samples)
 
     def process(self, data_frame: DataFrame) -> None:
+        if not self.do_fit(data_frame) or not self.do_predict(data_frame):
+            return
+
         reshaped = np.array(data_frame[self.source_column].values).reshape(-1, 1)
 
         self.db.fit(reshaped)

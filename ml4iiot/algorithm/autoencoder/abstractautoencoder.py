@@ -26,23 +26,26 @@ class AbstractAutoencoder(AbstractAlgorithm):
     def create_autoencoder_model(self) -> Model:
         pass
 
-    def do_fit(self, data_frame: DataFrame) -> bool:
-        return True
-
     def process(self, data_frame: DataFrame) -> None:
         normalized_input = np.array([data_frame[self.get_config('input')]])
-
-        normalized_reconstruction = self.autoencoder.predict(normalized_input)
-        normalized_reconstruction_difference = normalized_reconstruction - normalized_input
-        normalized_reconstruction_error = sum(abs(normalized_reconstruction_difference[0]))
-
-        data_frame['reconstruction'] = normalized_reconstruction[0]
-        data_frame['absolute_reconstruction_error'] = float('nan')
-        data_frame['relative_reconstruction_error'] = float('nan')
         data_frame['do_fit'] = float('nan')
+        data_frame['do_predict'] = float('nan')
 
-        data_frame['absolute_reconstruction_error'].iloc[-1] = normalized_reconstruction_error
-        data_frame['relative_reconstruction_error'].iloc[-1] = normalized_reconstruction_error / len(data_frame.index)
+        if self.do_predict(data_frame):
+            data_frame['do_predict'].iloc[-1] = 1
+
+            normalized_reconstruction = self.autoencoder.predict(normalized_input)
+            normalized_reconstruction_difference = normalized_reconstruction - normalized_input
+            normalized_reconstruction_error = sum(abs(normalized_reconstruction_difference[0]))
+
+            data_frame['reconstruction'] = normalized_reconstruction[0]
+            data_frame['absolute_reconstruction_error'] = float('nan')
+            data_frame['relative_reconstruction_error'] = float('nan')
+
+            data_frame['absolute_reconstruction_error'].iloc[-1] = normalized_reconstruction_error
+            data_frame['relative_reconstruction_error'].iloc[-1] = normalized_reconstruction_error / len(data_frame.index)
+        else:
+            data_frame['do_predict'].iloc[-1] = 0
 
         if self.do_fit(data_frame):
             data_frame['do_fit'].iloc[-1] = 1
