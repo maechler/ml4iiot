@@ -18,7 +18,7 @@ def get_project_root() -> Path:
     return Path(__file__).parent.parent
 
 
-def get_absolute_path(path: Union[Path,str]) -> Path:
+def get_absolute_path(path: Union[Path, str]) -> Path:
     path_obj = Path(path)
 
     return path_obj if path_obj.is_absolute() else get_project_root().joinpath(path_obj)

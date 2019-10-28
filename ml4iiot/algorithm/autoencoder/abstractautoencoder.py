@@ -12,6 +12,9 @@ class AbstractAutoencoder(AbstractAlgorithm):
         super().__init__(config)
 
         self.verbose = str2bool(self.get_config('verbose', default=False))
+        self.batch_size = self.get_config('batch_size', default=1)
+        self.epochs = self.get_config('epochs', default=1)
+        self.next_batch = []
         self.autoencoder = self.create_autoencoder_model()
 
         self.autoencoder.compile(
@@ -49,6 +52,11 @@ class AbstractAutoencoder(AbstractAlgorithm):
 
         if self.do_fit(data_frame):
             data_frame['do_fit'].iloc[-1] = 1
-            self.autoencoder.fit(normalized_input, normalized_input, batch_size=1, epochs=1, verbose=self.verbose)
+            self.next_batch.append(normalized_input[0])
+
+            if len(self.next_batch) >= self.batch_size:
+                arr = np.array(self.next_batch)
+                self.autoencoder.fit(arr, arr, batch_size=self.batch_size, epochs=self.epochs, verbose=self.verbose)
+                self.next_batch = []
         else:
             data_frame['do_fit'].iloc[-1] = 0
