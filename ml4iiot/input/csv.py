@@ -1,9 +1,8 @@
 from pandas import DataFrame
 from ml4iiot.input.abstractinput import AbstractInput
-from datetime import datetime
-import dateutil.parser
 import pandas as pd
 import csv
+from ml4iiot.utility import datetime_string_to_object
 
 
 class CsvInput(AbstractInput):
@@ -44,14 +43,6 @@ class CsvInput(AbstractInput):
 
         return data_frame
 
-    def datetime_string_to_object(self, datetime_string: str, datetime_format: str) -> datetime:
-        if datetime_format == 'timestamp':
-            return datetime.fromtimestamp(float(datetime_string))
-        elif datetime_format == 'iso':
-            return dateutil.parser.isoparse(datetime_string)
-        else:
-            return datetime.strptime(datetime_string, datetime_format)
-
     def add_row_to_pandas_dict(self, pandas_dict: dict, row: dict) -> None:
         for key, value in row.items():
             if key not in self.columns:
@@ -61,7 +52,7 @@ class CsvInput(AbstractInput):
                 self.append_value_to_dict(
                     pandas_dict,
                     key,
-                    self.datetime_string_to_object(value, self.get_config('columns', key, 'datetime_format'))
+                    datetime_string_to_object(value, self.get_config('columns', key, 'datetime_format'))
                 )
             elif self.get_column_type(key) == 'int':
                 self.append_value_to_dict(pandas_dict, key, int(value))
