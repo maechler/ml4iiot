@@ -1,4 +1,6 @@
 import importlib
+from datetime import datetime, timezone
+import dateutil
 from pathlib import Path
 from typing import Union
 
@@ -35,3 +37,12 @@ def get_recursive_config(config: dict, *args, **kwargs):
                 return kwargs['default']
 
     return config
+
+
+def datetime_string_to_object(datetime_string: str, datetime_format: str) -> datetime:
+    if datetime_format == 'timestamp':
+        return datetime.fromtimestamp(float(datetime_string), tz=timezone.utc)
+    elif datetime_format == 'iso':
+        return dateutil.parser.isoparse(datetime_string)
+    else:
+        return datetime.strptime(datetime_string, datetime_format)

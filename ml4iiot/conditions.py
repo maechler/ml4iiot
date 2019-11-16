@@ -1,7 +1,7 @@
 from datetime import datetime
 from abc import ABC, abstractmethod
 from pandas import DataFrame
-from ml4iiot.utility import get_recursive_config, instance_from_config, str2bool
+from ml4iiot.utility import get_recursive_config, instance_from_config, str2bool, datetime_string_to_object
 
 
 class AbstractCondition(ABC):
@@ -100,5 +100,35 @@ class DaytimeCondition(AbstractCondition):
 
         if data_frame_start_timestamp.time() > self.end_time or data_frame_end_timestamp.time() > self.end_time:
             return False
+
+        return True
+
+
+class DatetimeCondition(AbstractCondition):
+    def __init__(self, config):
+        super().__init__(config)
+
+        self.start_datetime = None
+        self.end_datetime = None
+        start_datetime_config = self.get_config('start_datetime', default=None)
+        end_datetime_config = self.get_config('end_datetime', default=None)
+
+        if start_datetime_config is not None:
+            self.start_datetime = datetime_string_to_object(start_datetime_config, 'iso')
+
+        if end_datetime_config is not None:
+            self.end_datetime = datetime_string_to_object(end_datetime_config, 'iso')
+
+    def evaluate_logic(self, data_frame: DataFrame) -> bool:
+        data_frame_start_timestamp = data_frame.index[0]
+        data_frame_end_timestamp = data_frame.index[-1]
+
+        if self.start_datetime is not None:
+            if data_frame_start_timestamp < self.start_datetime or data_frame_end_timestamp < self.start_datetime:
+                return False
+
+        if self.end_datetime is not None:
+            if data_frame_start_timestamp > self.end_datetime or data_frame_end_timestamp > self.end_datetime:
+                return False
 
         return True
