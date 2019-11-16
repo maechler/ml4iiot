@@ -51,15 +51,22 @@ class PlotOutput(AbstractOutput):
                     continue
 
                 sanitized_column = self.accumulated_data_frame[plot_config['column']].dropna()
+                plot_type = get_recursive_config(plot_config, 'type', default='line')
 
-                ax.plot(
-                    sanitized_column.index,
-                    sanitized_column.values,
-                    color=get_recursive_config(plot_config, 'color', default='#2A638C'),
-                    label=plot_config['column'],
-                    linestyle=get_recursive_config(plot_config, 'linestyle', default='solid'),
-                    marker=get_recursive_config(plot_config, 'marker', default=None)
-                )
+                if plot_type == 'line':
+                    ax.plot(
+                        sanitized_column.index,
+                        sanitized_column.values,
+                        color=get_recursive_config(plot_config, 'color', default='#2A638C'),
+                        label=plot_config['column'],
+                        linestyle=get_recursive_config(plot_config, 'linestyle', default='solid'),
+                        marker=get_recursive_config(plot_config, 'marker', default=None)
+                    )
+                elif plot_type == 'histogram':
+                    ax.hist(
+                        sanitized_column.values,
+                        bins=get_recursive_config(plot_config, 'bins', default=40)
+                    )
 
             plt.legend(loc='best')
             fig.autofmt_xdate()
