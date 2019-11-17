@@ -15,6 +15,9 @@ class AbstractAutoencoder(AbstractAlgorithm):
         self.batch_size = self.get_config('batch_size', default=1)
         self.epochs = self.get_config('epochs', default=1)
         self.next_batch = []
+        self.autoencoder = None
+
+    def init(self) -> None:
         self.autoencoder = self.create_autoencoder_model()
 
         self.autoencoder.compile(
@@ -29,34 +32,37 @@ class AbstractAutoencoder(AbstractAlgorithm):
     def create_autoencoder_model(self) -> Model:
         pass
 
+    def data_frame_to_input_data(self, data_frame: DataFrame):
+        return np.array([data_frame[self.get_config('input')]])
+
     def process(self, data_frame: DataFrame) -> None:
-        normalized_input = np.array([data_frame[self.get_config('input')]])
         data_frame['do_fit'] = float('nan')
         data_frame['do_predict'] = float('nan')
+        input_data = self.data_frame_to_input_data(data_frame)
 
         if self.do_predict(data_frame):
             data_frame['do_predict'].iloc[-1] = 1
 
-            normalized_reconstruction = self.autoencoder.predict(normalized_input)
-            normalized_reconstruction_difference = normalized_reconstruction - normalized_input
-            normalized_reconstruction_error = sum(abs(normalized_reconstruction_difference[0]))
+            reconstruction = self.autoencoder.predict(input_data)
+            reconstruction_difference = reconstruction - input_data
+            reconstruction_error = sum(abs(reconstruction_difference[0]))
 
-            data_frame['reconstruction'] = normalized_reconstruction[0]
+            data_frame['reconstruction'] = reconstruction[0]
             data_frame['absolute_reconstruction_error'] = float('nan')
             data_frame['relative_reconstruction_error'] = float('nan')
 
-            data_frame['absolute_reconstruction_error'].iloc[-1] = normalized_reconstruction_error
-            data_frame['relative_reconstruction_error'].iloc[-1] = normalized_reconstruction_error / len(data_frame.index)
+            data_frame['absolute_reconstruction_error'].iloc[-1] = reconstruction_error
+            data_frame['relative_reconstruction_error'].iloc[-1] = reconstruction_error / len(data_frame.index)
         else:
             data_frame['do_predict'].iloc[-1] = 0
 
         if self.do_fit(data_frame):
             data_frame['do_fit'].iloc[-1] = 1
-            self.next_batch.append(normalized_input[0])
+            self.next_batch.append(input_data[0])
 
             if len(self.next_batch) >= self.batch_size:
-                arr = np.array(self.next_batch)
-                self.autoencoder.fit(arr, arr, batch_size=self.batch_size, epochs=self.epochs, verbose=self.verbose)
+                next_batch = np.array(self.next_batch)
+                self.autoencoder.fit(next_batch, next_batch, batch_size=self.batch_size, epochs=self.epochs, verbose=self.verbose)
                 self.next_batch = []
         else:
             data_frame['do_fit'].iloc[-1] = 0
