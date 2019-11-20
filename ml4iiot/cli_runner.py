@@ -1,7 +1,7 @@
-import argparse
 import yaml
 import json
 from ml4iiot.pipeline.pipeline import Pipeline
+from ml4iiot.utility import get_cli_arguments
 
 
 def run(config_path: str, config_format: str) -> None:
@@ -19,11 +19,6 @@ def run(config_path: str, config_format: str) -> None:
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('-c', '--config_path', help='Path to a config file.', type=str, required=True)
-    parser.add_argument('-f', '--format', help='Format of the config file.', type=str, default='yaml')
-
-    args = parser.parse_args()
+    args = get_cli_arguments()
 
     run(args.config_path, args.format)

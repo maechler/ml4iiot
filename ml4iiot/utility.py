@@ -1,4 +1,6 @@
+import argparse
 import importlib
+from argparse import Namespace
 from datetime import datetime, timezone
 import dateutil
 from pathlib import Path
@@ -46,3 +48,12 @@ def datetime_string_to_object(datetime_string: str, datetime_format: str) -> dat
         return dateutil.parser.isoparse(datetime_string)
     else:
         return datetime.strptime(datetime_string, datetime_format)
+
+
+def get_cli_arguments() -> Namespace:
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-c', '--config_path', help='Path to a config file.', type=str, required=True)
+    parser.add_argument('-f', '--format', help='Format of the config file.', type=str, default='yaml')
+
+    return parser.parse_args()
