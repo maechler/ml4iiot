@@ -12,6 +12,9 @@ class MovingExponentialSmoothing(AbstractStep):
         self.moving_value = None
 
     def process(self, data_frame: DataFrame) -> None:
+        if self.source_column not in data_frame:
+            return
+
         current_value = data_frame[self.source_column].values[-1]
 
         if self.moving_value is None:
