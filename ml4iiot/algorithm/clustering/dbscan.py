@@ -1,3 +1,5 @@
+from collections import deque
+
 from pandas import DataFrame
 from ml4iiot.algorithm.abstractalgorithm import AbstractAlgorithm
 from sklearn.cluster import DBSCAN as SkDBSCAN
@@ -22,11 +24,38 @@ class DBSCAN(AbstractAlgorithm):
 
         self.db.fit(reshaped)
 
-        number_of_clusters = len(set(self.db.labels_)) - (1 if -1 in self.db.labels_ else 0)
-        number_of_noise = list(self.db.labels_).count(-1)
-
         data_frame['number_of_clusters'] = float('nan')
         data_frame['number_of_noise'] = float('nan')
 
-        data_frame['number_of_clusters'].iloc[-1] = number_of_clusters
-        data_frame['number_of_noise'].iloc[-1] = number_of_noise
+        data_frame['number_of_clusters'].iloc[-1] = self.get_number_of_clusters()
+        data_frame['number_of_noise'].iloc[-1] = self.get_number_of_noise()
+
+    def get_number_of_clusters(self) -> int:
+        return len(set(self.db.labels_)) - (1 if -1 in self.db.labels_ else 0)
+
+    def get_number_of_noise(self) -> int:
+        return list(self.db.labels_).count(-1)
+
+
+class BatchDBSCAN(DBSCAN):
+
+    def __init__(self, config: dict):
+        super().__init__(config)
+
+        self.queue_size = self.get_config('queue_size', default=100)
+        self.queue = deque(maxlen=self.queue_size)
+
+    def process(self, data_frame: DataFrame) -> None:
+        if not self.do_fit(data_frame) or not self.do_predict(data_frame):
+            return
+
+        self.queue.append(data_frame[self.source_column].values)
+
+        if len(self.queue) == self.queue_size:
+            self.db.fit(list(self.queue))
+
+            data_frame['number_of_clusters'] = float('nan')
+            data_frame['number_of_noise'] = float('nan')
+
+            data_frame['number_of_clusters'].iloc[-1] = self.get_number_of_clusters()
+            data_frame['number_of_noise'].iloc[-1] = self.get_number_of_noise()
