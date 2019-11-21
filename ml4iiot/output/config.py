@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from shutil import copyfile
 from pandas import DataFrame
@@ -19,6 +20,11 @@ class ConfigOutput(AbstractOutput):
         config_path = args.config_path
         config_format = args.format
         target_file_name = datetime.now().strftime('%Y_%m_%d_%H_%M_%S') + '_conf.' + config_format
-        target_path = get_absolute_path(self.save_path + target_file_name)
+        save_path = os.path.join(str(get_absolute_path(self.save_path)), datetime.now().strftime('%Y_%m_%d'))
+
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+
+        target_path = os.path.join(save_path, target_file_name)
 
         copyfile(config_path, target_path)

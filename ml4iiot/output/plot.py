@@ -1,5 +1,5 @@
+import os
 from datetime import datetime
-from matplotlib.path import Path
 from pandas import DataFrame
 from ml4iiot.output.abstractoutput import AbstractOutput
 import matplotlib.pyplot as plt
@@ -93,12 +93,17 @@ class PlotOutput(AbstractOutput):
         if self.show_plots:
             plt.show()
 
-    def get_save_path_from_figure_config(self, figure_config: dict, file_extension: str = '') -> Path:
+    def get_save_path_from_figure_config(self, figure_config: dict, file_extension: str = '') -> str:
+        folder_name = datetime.now().strftime('%Y_%m_%d')
         file_name = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+        save_path = os.path.join(str(get_absolute_path(self.save_path)), folder_name)
+
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
 
         for plot_config in figure_config['plots']:
             file_name += '_' + plot_config['column']
 
-        figure_path = self.save_path + file_name + '.' + file_extension
+        file_path = os.path.join(save_path, file_name + '.' + file_extension)
 
-        return get_absolute_path(figure_path)
+        return file_path
