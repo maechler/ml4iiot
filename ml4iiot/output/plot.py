@@ -45,6 +45,7 @@ class PlotOutput(AbstractOutput):
 
         for figure_config in self.get_config('figures'):
             fig, ax = plt.subplots()
+            x_axis_formatter = get_recursive_config(figure_config, 'x_axis_formatter', default='datetime')
 
             for plot_config in figure_config['plots']:
                 if not plot_config['column'] in self.accumulated_data_frame:
@@ -55,7 +56,7 @@ class PlotOutput(AbstractOutput):
 
                 if plot_type == 'line':
                     ax.plot(
-                        sanitized_column.index,
+                        sanitized_column.index if x_axis_formatter == 'datetime' else range(0, len(sanitized_column.index)),
                         sanitized_column.values,
                         color=get_recursive_config(plot_config, 'color', default='#2A638C'),
                         label=plot_config['column'],
