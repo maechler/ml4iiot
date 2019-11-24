@@ -46,12 +46,14 @@ class PlotOutput(AbstractOutput):
         for figure_config in self.get_config('figures'):
             fig, ax = plt.subplots()
             x_axis_formatter = get_recursive_config(figure_config, 'x_axis_formatter', default='datetime')
+            start_datetime = get_recursive_config(figure_config, 'start_datetime', default=None)
+            end_datetime = get_recursive_config(figure_config, 'end_datetime', default=None)
 
             for plot_config in figure_config['plots']:
                 if not plot_config['column'] in self.accumulated_data_frame:
                     continue
 
-                sanitized_column = self.accumulated_data_frame[plot_config['column']].dropna()
+                sanitized_column = self.accumulated_data_frame.loc[start_datetime:end_datetime][plot_config['column']].dropna()
                 plot_type = get_recursive_config(plot_config, 'type', default='line')
 
                 if plot_type == 'line':
@@ -66,20 +68,25 @@ class PlotOutput(AbstractOutput):
                 elif plot_type == 'histogram':
                     ax.hist(
                         sanitized_column.values,
+                        color=get_recursive_config(plot_config, 'color', default='#2A638C'),
                         bins=get_recursive_config(plot_config, 'bins', default=40)
                     )
 
-            plt.legend(loc='best')
-            fig.autofmt_xdate()
-
             if 'xlabel' in figure_config:
-                ax.set_xlabel(figure_config['xlabel'])
+                ax.set_xlabel(figure_config['xlabel'], labelpad=10)
 
             if 'ylabel' in figure_config:
-                ax.set_ylabel(figure_config['ylabel'])
+                ax.set_ylabel(figure_config['ylabel'], labelpad=10)
 
             if 'title' in figure_config:
                 ax.set_title(figure_config['title'])
+
+            if 'ylim' in figure_config:
+                ax.set_ylim([0, figure_config['ylim']])
+
+            plt.tight_layout(0)
+            plt.legend(loc='best')
+            fig.autofmt_xdate()
 
             if self.save_to_image:
                 image_save_path = self.get_save_path_from_figure_config(figure_config, self.format)
@@ -96,8 +103,9 @@ class PlotOutput(AbstractOutput):
 
     def get_save_path_from_figure_config(self, figure_config: dict, file_extension: str = '') -> str:
         folder_name = datetime.now().strftime('%Y_%m_%d')
-        file_name = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+        file_name = datetime.now().strftime('%Y_%m_%d_%H_%M')
         save_path = os.path.join(str(get_absolute_path(self.save_path)), folder_name)
+        i = 1
 
         if not os.path.exists(save_path):
             os.makedirs(save_path)
@@ -106,5 +114,9 @@ class PlotOutput(AbstractOutput):
             file_name += '_' + plot_config['column']
 
         file_path = os.path.join(save_path, file_name + '.' + file_extension)
+
+        while os.path.exists(file_path):
+            file_path = os.path.join(save_path, file_name + '_' + str(i) + '.' + file_extension)
+            i = i + 1
 
         return file_path
