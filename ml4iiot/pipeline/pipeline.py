@@ -30,11 +30,19 @@ class Pipeline:
             steps = self.steps[1:]  # Skip input step
 
             for data_frame in iter(self.input):
-                for step in steps:
-                    step.process(data_frame)
+                try:
+                    for step in steps:
+                        step.process(data_frame)
+                except SkipDataFrameException:
+                    pass
+
         finally:
             for step in self.steps:
                 step.destroy()
 
     def get_config(self, *args, **kwargs):
         return get_recursive_config(self.config, *args, **kwargs)
+
+
+class SkipDataFrameException(Exception):
+    pass
