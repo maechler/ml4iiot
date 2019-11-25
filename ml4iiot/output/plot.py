@@ -61,7 +61,7 @@ class PlotOutput(AbstractOutput):
                         sanitized_column.index if x_axis_formatter == 'datetime' else range(0, len(sanitized_column.index)),
                         sanitized_column.values,
                         color=get_recursive_config(plot_config, 'color', default='#2A638C'),
-                        label=plot_config['column'],
+                        label=plot_config['label'] if 'label' in plot_config else plot_config['column'],
                         linestyle=get_recursive_config(plot_config, 'linestyle', default='solid'),
                         marker=get_recursive_config(plot_config, 'marker', default=None)
                     )
@@ -69,7 +69,8 @@ class PlotOutput(AbstractOutput):
                     ax.hist(
                         sanitized_column.values,
                         color=get_recursive_config(plot_config, 'color', default='#2A638C'),
-                        bins=get_recursive_config(plot_config, 'bins', default=40)
+                        bins=get_recursive_config(plot_config, 'bins', default=40),
+                        range=[get_recursive_config(plot_config, 'range', 'min', default=None), get_recursive_config(plot_config, 'range', 'max', default=None)]
                     )
 
             if 'xlabel' in figure_config:
@@ -82,7 +83,10 @@ class PlotOutput(AbstractOutput):
                 ax.set_title(figure_config['title'])
 
             if 'ylim' in figure_config:
-                ax.set_ylim([0, figure_config['ylim']])
+                ax.set_ylim([figure_config['ylim']['min'], figure_config['ylim']['max']])
+
+            if 'xlim' in figure_config:
+                ax.set_xlim([figure_config['xlim']['min'], figure_config['xlim']['max']])
 
             plt.tight_layout(0)
             plt.legend(loc='best')
