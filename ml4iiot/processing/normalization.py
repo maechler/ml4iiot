@@ -7,7 +7,7 @@ class MinMaxScaler(AbstractStep):
     def __init__(self, config: dict):
         super().__init__(config)
 
-        self.mode = 'normalize'
+        self.mode = self.get_config('mode', default='normalize')
 
         self.source_range_min = self.get_config('source_range_min', default='window')
         self.source_range_max = self.get_config('source_range_max', default='window')
