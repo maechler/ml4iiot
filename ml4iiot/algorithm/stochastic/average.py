@@ -23,16 +23,16 @@ class ExponentialWeightedMovingAverage(AbstractAlgorithm):
 
         self.column_mapping = self.get_config('column_mapping')
         self.smoothing_factor = self.get_config('smoothing_factor', default=0.1)
-        self.moving_average = None
+        self.moving_averages = {}
 
     def process(self, data_frame: DataFrame) -> None:
         for source_column, target_column in self.column_mapping.items():
             current_average = data_frame[source_column].mean()
 
-            if self.moving_average is None:
-                self.moving_average = current_average
+            if target_column not in self.moving_averages:
+                self.moving_averages[target_column] = current_average
             else:
-                self.moving_average = self.smoothing_factor * current_average + (1 - self.smoothing_factor) * self.moving_average
+                self.moving_averages[target_column] = self.smoothing_factor * current_average + (1 - self.smoothing_factor) * self.moving_averages[target_column]
 
             data_frame[target_column] = float('nan')
-            data_frame[target_column].iloc[-1] = self.moving_average
+            data_frame[target_column].iloc[-1] = self.moving_averages[target_column]
