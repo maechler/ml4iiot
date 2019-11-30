@@ -63,15 +63,42 @@ class PlotOutput(AbstractOutput):
                         color=get_recursive_config(plot_config, 'color', default='#2A638C'),
                         label=plot_config['label'] if 'label' in plot_config else plot_config['column'],
                         linestyle=get_recursive_config(plot_config, 'linestyle', default='solid'),
+                        alpha=get_recursive_config(plot_config, 'alpha', default=1),
                         marker=get_recursive_config(plot_config, 'marker', default=None)
                     )
                 elif plot_type == 'histogram':
+                    histogram_range = None
+                    range_min = get_recursive_config(plot_config, 'range', 'min', default=None)
+                    range_max = get_recursive_config(plot_config, 'range', 'max', default=None)
+
+                    if range_min or range_max:
+                        histogram_range = [range_min, range_max]
+
                     ax.hist(
                         sanitized_column.values,
                         color=get_recursive_config(plot_config, 'color', default='#2A638C'),
                         bins=get_recursive_config(plot_config, 'bins', default=40),
-                        range=[get_recursive_config(plot_config, 'range', 'min', default=None), get_recursive_config(plot_config, 'range', 'max', default=None)]
+                        label=plot_config['label'] if 'label' in plot_config else plot_config['column'],
+                        histtype=get_recursive_config(plot_config, 'histtype', default='bar'),
+                        alpha=get_recursive_config(plot_config, 'alpha', default=1),
+                        range=histogram_range,
                     )
+
+            if 'vline' in figure_config:
+                for vline_config in figure_config['vline']:
+                    color = get_recursive_config(vline_config, 'color', default='#2A638C')
+                    linestyle = get_recursive_config(vline_config, 'linestyle', default='solid')
+                    label = get_recursive_config(vline_config, 'label', default=None)
+
+                    plt.axvline(x=vline_config['x'], color=color, linestyle=linestyle, label=label)
+
+            if 'hline' in figure_config:
+                for hline_config in figure_config['hline']:
+                    color = get_recursive_config(hline_config, 'color', default='#2A638C')
+                    linestyle = get_recursive_config(hline_config, 'linestyle', default='solid')
+                    label = get_recursive_config(hline_config, 'label', default=None)
+
+                    plt.axvline(y=hline_config['x'], color=color, linestyle=linestyle, label=label)
 
             if 'xlabel' in figure_config:
                 ax.set_xlabel(figure_config['xlabel'], labelpad=10)
