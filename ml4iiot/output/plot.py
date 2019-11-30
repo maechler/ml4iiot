@@ -58,7 +58,7 @@ class PlotOutput(AbstractOutput):
 
                 if plot_type == 'line':
                     ax.plot(
-                        sanitized_column.index if x_axis_formatter == 'datetime' else range(0, len(sanitized_column.index)),
+                        sanitized_column.index if x_axis_formatter == 'datetime' else list(map(lambda x: x.value, sanitized_column.index)),
                         sanitized_column.values,
                         color=get_recursive_config(plot_config, 'color', default='#2A638C'),
                         label=plot_config['label'] if 'label' in plot_config else plot_config['column'],
