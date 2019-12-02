@@ -12,11 +12,17 @@ class Mad(AbstractAlgorithm):
 
     def process(self, data_frame: DataFrame) -> None:
         for source_column, target_column in self.column_mapping.items():
-            data = np.array(data_frame[source_column].values)
-            median = np.median(data)
-            deviations = data - median
-            absolute_deviations = np.abs(deviations)
-            mad = np.median(absolute_deviations)
+            mad = compute_mad(data_frame[source_column].values)
 
             data_frame[target_column] = float('nan')
             data_frame[target_column].iloc[-1] = mad
+
+
+def compute_mad(data: list):
+    data = np.array(data)
+    median = np.median(data)
+    deviations = data - median
+    absolute_deviations = np.abs(deviations)
+    mad = np.median(absolute_deviations)
+
+    return mad
