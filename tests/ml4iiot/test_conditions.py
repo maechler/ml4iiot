@@ -9,10 +9,16 @@ class TestConditions(unittest.TestCase):
     seconds_in_an_hour = 60 * 60
 
     def create_data_frame(self, timestamp):
-        datetime_column_object = datetime.utcfromtimestamp(timestamp)
+        index_values = []
+
+        if isinstance(timestamp, int):
+            index_values.append(datetime.utcfromtimestamp(timestamp))
+        else:
+            for t in timestamp:
+                index_values.append(datetime.utcfromtimestamp(t))
 
         return pd.DataFrame(
-            {'index': [datetime_column_object]},
+            {'index': index_values},
             columns=['index']
         ).set_index('index')
 
@@ -189,6 +195,27 @@ class TestConditions(unittest.TestCase):
         self.assertTrue(daytime_condition.evaluate(in_time_window_1))
         self.assertTrue(daytime_condition.evaluate(in_time_window_2))
         self.assertFalse(daytime_condition.evaluate(after_time_window))
+
+    def test_time_delta_condition(self):
+        time_delta_condition = instance_from_config({
+            'class': 'ml4iiot.conditions.TimeDeltaCondition',
+            'config': {
+                'min_time_delta': {
+                    'seconds': 10,
+                },
+                'max_time_delta': {
+                    'seconds': 100
+                }
+            }
+        })
+
+        valid = self.create_data_frame([0, 10, 20, 40, 100])
+        too_short = self.create_data_frame([0, 5, 15, 20, 25])
+        too_large = self.create_data_frame([0, 50, 150, 300, 350])
+
+        self.assertTrue(time_delta_condition.evaluate(valid))
+        self.assertFalse(time_delta_condition.evaluate(too_short))
+        self.assertFalse(time_delta_condition.evaluate(too_large))
 
 
 if __name__ == '__main__':

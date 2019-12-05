@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from abc import ABC, abstractmethod
 from pandas import DataFrame
 from ml4iiot.utility import get_recursive_config, instance_from_config, str2bool, datetime_string_to_object
@@ -130,5 +130,49 @@ class DatetimeCondition(AbstractCondition):
         if self.end_datetime is not None:
             if data_frame_start_timestamp > self.end_datetime or data_frame_end_timestamp > self.end_datetime:
                 return False
+
+        return True
+
+
+class TimeDeltaCondition(AbstractCondition):
+    def __init__(self, config):
+        super().__init__(config)
+
+        self.min_time_delta = None
+        self.max_time_delta = None
+
+        if self.get_config('min_time_delta', default=None) is not None:
+            self.min_time_delta = timedelta(
+                microseconds=self.get_config('min_time_delta', 'microseconds', default=0),
+                milliseconds=self.get_config('min_time_delta', 'milliseconds', default=0),
+                seconds=self.get_config('min_time_delta', 'seconds', default=0),
+                minutes=self.get_config('min_time_delta', 'minutes', default=0),
+                hours=self.get_config('min_time_delta', 'hours', default=0),
+                days=self.get_config('min_time_delta', 'days', default=0),
+                weeks=self.get_config('min_time_delta', 'weeks', default=0),
+            )
+
+        if self.get_config('max_time_delta', default=None) is not None:
+            self.max_time_delta = timedelta(
+                microseconds=self.get_config('max_time_delta', 'microseconds', default=0),
+                milliseconds=self.get_config('max_time_delta', 'milliseconds', default=0),
+                seconds=self.get_config('max_time_delta', 'seconds', default=0),
+                minutes=self.get_config('max_time_delta', 'minutes', default=0),
+                hours=self.get_config('max_time_delta', 'hours', default=0),
+                days=self.get_config('max_time_delta', 'days', default=0),
+                weeks=self.get_config('max_time_delta', 'weeks', default=0),
+            )
+
+    def evaluate_logic(self, data_frame: DataFrame) -> bool:
+        previous_index = None
+
+        for index, _ in data_frame.iterrows():
+            if previous_index is not None:
+                if self.min_time_delta and index - previous_index < self.min_time_delta:
+                    return False
+                elif self.max_time_delta and index - previous_index > self.max_time_delta:
+                    return False
+
+            previous_index = index
 
         return True
