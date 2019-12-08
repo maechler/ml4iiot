@@ -1,13 +1,18 @@
 from ml4iiot.utility import instance_from_config, get_recursive_config
+import os
 
 
 class Pipeline:
-
     def __init__(self, config):
         self.config = config
+        keras_backend = self.get_config('settings', 'keras_backend', default='')
+
+        if keras_backend:
+            os.environ['KERAS_BACKEND'] = keras_backend
+
         self.input = instance_from_config(self.get_config('input'))
-        self.algorithm = instance_from_config(config['algorithm'])
-        self.output = instance_from_config(config['output'])
+        self.algorithm = instance_from_config(self.get_config('algorithm'))
+        self.output = instance_from_config(self.get_config('output'))
         self.steps = []
 
         self.steps.append(self.input)

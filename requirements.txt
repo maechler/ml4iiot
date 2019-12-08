@@ -1,7 +1,9 @@
-kafka~=1.3.5
-numpy~=1.15.2
-matplotlib~=2.2.4
-keras~=2.3.0
-tensorflow~=2.0.0
-pandas~=0.25.1
+kafka==1.3.5
+numpy==1.16.0
+matplotlib==2.2.4
+keras==2.2.4
+tensorflow==1.15.0
+pandas==0.25.1
 sklearn==0.0
+plaidml-keras==0.6.4
+plaidbench==0.6.4
