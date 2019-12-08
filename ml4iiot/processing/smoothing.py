@@ -6,21 +6,25 @@ class MovingExponentialSmoothing(AbstractStep):
     def __init__(self, config: dict):
         super().__init__(config)
 
-        self.source_column = self.get_config('source_column')
-        self.target_column = self.get_config('target_column')
+        self.column_mapping = self.get_config('column_mapping')
         self.smoothing_factor = self.get_config('smoothing_factor', default=0.1)
-        self.moving_value = None
+        self.moving_values = {}
+
+    def get_column_mapping_key(self, source_column: str, target_column: str) -> str:
+        return source_column + '_' + target_column
 
     def process(self, data_frame: DataFrame) -> None:
-        if self.source_column not in data_frame:
-            return
+        for source_column, target_column in self.column_mapping.items():
+            if source_column not in data_frame:
+                continue
 
-        current_value = data_frame[self.source_column].values[-1]
+            key = self.get_column_mapping_key(source_column, target_column)
+            current_value = data_frame[source_column].values[-1]
 
-        if self.moving_value is None:
-            self.moving_value = current_value
-        else:
-            self.moving_value = self.smoothing_factor * current_value + (1 - self.smoothing_factor) * self.moving_value
+            if key not in self.moving_values:
+                self.moving_values[key] = current_value
+            else:
+                self.moving_values[key] = self.smoothing_factor * current_value + (1 - self.smoothing_factor) * self.moving_values[key]
 
-        data_frame[self.target_column] = float('nan')
-        data_frame[self.target_column].iloc[-1] = self.moving_value
+            data_frame[target_column] = float('nan')
+            data_frame[target_column].iloc[-1] = self.moving_values[key]
