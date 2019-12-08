@@ -9,6 +9,15 @@ from pandas.plotting import register_matplotlib_converters
 from ml4iiot.utility import str2bool, get_absolute_path, get_recursive_config
 
 
+colors = {
+    'red': '#D01431',
+    'yellow': '#F2C430',
+    'green': '#5DB64D',
+    'grey': '#A6A5A1',
+    'blue': '#2A638C',
+}
+
+
 class PlotOutput(AbstractOutput):
 
     def __init__(self, config):
@@ -60,7 +69,7 @@ class PlotOutput(AbstractOutput):
                     ax.plot(
                         sanitized_column.index if x_axis_formatter == 'datetime' else list(map(lambda x: x.value, sanitized_column.index)),
                         sanitized_column.values,
-                        color=get_recursive_config(plot_config, 'color', default='#2A638C'),
+                        color=self.get_color(get_recursive_config(plot_config, 'color', default=colors['blue'])),
                         label=plot_config['label'] if 'label' in plot_config else plot_config['column'],
                         linestyle=get_recursive_config(plot_config, 'linestyle', default='solid'),
                         alpha=get_recursive_config(plot_config, 'alpha', default=1),
@@ -76,7 +85,7 @@ class PlotOutput(AbstractOutput):
 
                     ax.hist(
                         sanitized_column.values,
-                        color=get_recursive_config(plot_config, 'color', default='#2A638C'),
+                        color=self.get_color(get_recursive_config(plot_config, 'color', default=colors['blue'])),
                         bins=get_recursive_config(plot_config, 'bins', default=40),
                         label=plot_config['label'] if 'label' in plot_config else plot_config['column'],
                         histtype=get_recursive_config(plot_config, 'histtype', default='bar'),
@@ -86,7 +95,7 @@ class PlotOutput(AbstractOutput):
 
             if 'vline' in figure_config:
                 for vline_config in figure_config['vline']:
-                    color = get_recursive_config(vline_config, 'color', default='#2A638C')
+                    color = self.get_color(get_recursive_config(vline_config, 'color', default=colors['red']))
                     linestyle = get_recursive_config(vline_config, 'linestyle', default='solid')
                     label = get_recursive_config(vline_config, 'label', default=None)
 
@@ -94,7 +103,7 @@ class PlotOutput(AbstractOutput):
 
             if 'hline' in figure_config:
                 for hline_config in figure_config['hline']:
-                    color = get_recursive_config(hline_config, 'color', default='#2A638C')
+                    color = self.get_color(get_recursive_config(hline_config, 'color', default=colors['red']))
                     linestyle = get_recursive_config(hline_config, 'linestyle', default='solid')
                     label = get_recursive_config(hline_config, 'label', default=None)
 
@@ -131,6 +140,9 @@ class PlotOutput(AbstractOutput):
 
         if self.show_plots:
             plt.show()
+
+    def get_color(self, color: str):
+        return color if color not in colors else colors[color]
 
     def get_save_path_from_figure_config(self, figure_config: dict, file_extension: str = '') -> str:
         folder_name = datetime.now().strftime('%Y_%m_%d')
