@@ -1,13 +1,10 @@
-import os
-from datetime import datetime
 from pandas import DataFrame
 from ml4iiot.output.abstractoutput import AbstractOutput
 import matplotlib.pyplot as plt
 import pandas as pd
 import pickle
 from pandas.plotting import register_matplotlib_converters
-from ml4iiot.utility import str2bool, get_absolute_path, get_recursive_config
-
+from ml4iiot.utility import str2bool, get_recursive_config, get_cli_arguments, get_current_out_path
 
 colors = {
     'red': '#D01431',
@@ -31,6 +28,7 @@ class PlotOutput(AbstractOutput):
 
         self.columns_to_plot = []
         self.accumulated_data_frame = None
+        self.cli_arguments = get_cli_arguments()
 
         for figure_config in self.get_config('figures'):
             for plot_config in figure_config['plots']:
@@ -145,21 +143,11 @@ class PlotOutput(AbstractOutput):
         return color if color not in colors else colors[color]
 
     def get_save_path_from_figure_config(self, figure_config: dict, file_extension: str = '') -> str:
-        folder_name = datetime.now().strftime('%Y_%m_%d')
-        file_name = datetime.now().strftime('%Y_%m_%d_%H_%M')
-        save_path = os.path.join(str(get_absolute_path(self.save_path)), folder_name)
-        i = 1
-
-        if not os.path.exists(save_path):
-            os.makedirs(save_path)
+        file_name = ''
 
         for plot_config in figure_config['plots']:
-            file_name += '_' + plot_config['column']
+            file_name += plot_config['column'] + '_'
 
-        file_path = os.path.join(save_path, file_name + '.' + file_extension)
+        file_name = file_name.rstrip('_') + '.' + file_extension
 
-        while os.path.exists(file_path):
-            file_path = os.path.join(save_path, file_name + '_' + str(i) + '.' + file_extension)
-            i = i + 1
-
-        return file_path
+        return get_current_out_path(file_name)

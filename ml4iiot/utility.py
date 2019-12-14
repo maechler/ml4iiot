@@ -29,6 +29,26 @@ def get_absolute_path(path: Union[Path, str]) -> Path:
     return path_obj if path_obj.is_absolute() else get_project_root().joinpath(path_obj)
 
 
+def get_current_out_path(file_name=None) -> str:
+    config_name = get_file_name_from_path((get_cli_arguments()).config_path)
+    date_time = datetime.now().strftime('%Y_%m_%d')
+    i = 1
+
+    out_path = os.path.join(str(get_absolute_path('./out')), date_time, config_name)
+
+    if not os.path.exists(out_path):
+        os.makedirs(out_path)
+
+    if file_name is not None:
+        out_path = os.path.join(out_path, datetime.now().strftime('%H_%M_%S') + '_' + file_name)
+
+        while os.path.exists(out_path):
+            out_path = os.path.join(out_path, datetime.now().strftime('%H_%M_%S') + '_' + str(i) + '_' + file_name)
+            i = i + 1
+
+    return out_path
+
+
 def get_recursive_config(config: dict, *args, **kwargs):
     for arg in args:
         if arg in config:
@@ -54,7 +74,7 @@ def datetime_string_to_object(datetime_string: str, datetime_format: str) -> dat
 def get_cli_arguments() -> Namespace:
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-c', '--config_path', help='Path to a config file.', type=str, required=True)
+    parser.add_argument('-c', '--config_path', help='Path to a config file or folder containing multiple config files.', type=str, required=True)
     parser.add_argument('-f', '--format', help='Format of the config file.', type=str, default='yaml')
 
     return parser.parse_args()

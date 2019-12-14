@@ -1,8 +1,6 @@
-import os
-from datetime import datetime
 from pandas import DataFrame
 from ml4iiot.output.abstractoutput import AbstractOutput
-from ml4iiot.utility import get_cli_arguments, get_absolute_path
+from ml4iiot.utility import get_cli_arguments, get_current_out_path
 
 
 class ConfigOutput(AbstractOutput):
@@ -10,7 +8,6 @@ class ConfigOutput(AbstractOutput):
         super().__init__(config)
 
         self.cli_arguments = get_cli_arguments()
-        self.save_path = self.get_config('save_path', default='./out/')
         self.config_content = None
 
     def init(self) -> None:
@@ -21,13 +18,8 @@ class ConfigOutput(AbstractOutput):
         pass
 
     def destroy(self) -> None:
-        target_file_name = datetime.now().strftime('%Y_%m_%d_%H_%M_%S') + '_conf.' + self.cli_arguments.format
-        save_path = os.path.join(str(get_absolute_path(self.save_path)), datetime.now().strftime('%Y_%m_%d'))
+        target_file_name = 'conf.' + self.cli_arguments.format
+        save_path = get_current_out_path(target_file_name)
 
-        if not os.path.exists(save_path):
-            os.makedirs(save_path)
-
-        target_path = os.path.join(save_path, target_file_name)
-
-        with open(target_path, 'w') as target_file_handle:
+        with open(save_path, 'w') as target_file_handle:
             target_file_handle.write(self.config_content)

@@ -1,6 +1,6 @@
 from pandas import DataFrame
 from ml4iiot.output.abstractoutput import AbstractOutput
-from ml4iiot.utility import instance_from_config, get_absolute_path
+from ml4iiot.utility import instance_from_config, get_current_out_path
 
 
 class CsvOutput(AbstractOutput):
@@ -9,7 +9,8 @@ class CsvOutput(AbstractOutput):
         super().__init__(config)
 
         self.do_output_condition = instance_from_config(self.get_config('do_output_condition', default={'class': 'ml4iiot.conditions.TrueCondition'}))
-        self.output_file_path = get_absolute_path(self.get_config('output_file_path', default='./out/csv_output.csv'))
+        self.output_file_name = self.get_config('output_file_name', default='csv_output.csv')
+        self.output_file_path = get_current_out_path(self.output_file_name)
         self.date_format = self.get_config('date_format', default='%s')
         self.columns = self.get_config('columns', default=None)
         self.output_file = None
