@@ -1,5 +1,6 @@
 import argparse
 import importlib
+import os
 from argparse import Namespace
 from datetime import datetime, timezone
 import dateutil
@@ -57,3 +58,7 @@ def get_cli_arguments() -> Namespace:
     parser.add_argument('-f', '--format', help='Format of the config file.', type=str, default='yaml')
 
     return parser.parse_args()
+
+
+def get_file_name_from_path(path: str) -> str:
+    return str(os.path.basename(path).split('.')[0])
