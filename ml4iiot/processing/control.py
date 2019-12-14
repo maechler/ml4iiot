@@ -1,6 +1,6 @@
 from pandas import DataFrame
-from ml4iiot.pipeline.pipeline import SkipDataFrameException
-from ml4iiot.pipeline.step import AbstractStep
+from ml4iiot.pipeline import SkipDataFrameException
+from ml4iiot.pipeline import AbstractStep
 from ml4iiot.utility import instance_from_config
 
 

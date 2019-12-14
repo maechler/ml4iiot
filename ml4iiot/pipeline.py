@@ -1,5 +1,7 @@
-from ml4iiot.utility import instance_from_config, get_recursive_config
 import os
+from abc import abstractmethod, ABC
+from pandas import DataFrame
+from ml4iiot.utility import instance_from_config, get_recursive_config
 
 
 class Pipeline:
@@ -53,3 +55,23 @@ class Pipeline:
 
 class SkipDataFrameException(Exception):
     pass
+
+
+class AbstractStep(ABC):
+    def __init__(self, config):
+        super().__init__()
+
+        self.config = config
+
+    def init(self) -> None:
+        pass
+
+    def destroy(self) -> None:
+        pass
+
+    @abstractmethod
+    def process(self, data_frame: DataFrame) -> None:
+        pass
+
+    def get_config(self, *args, **kwargs):
+        return get_recursive_config(self.config, *args, **kwargs)

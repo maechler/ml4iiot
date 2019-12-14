@@ -1,5 +1,5 @@
 from pandas import DataFrame
-from ml4iiot.pipeline.step import AbstractStep
+from ml4iiot.pipeline import AbstractStep
 import pandas as pd
 from ml4iiot.utility import instance_from_config
 

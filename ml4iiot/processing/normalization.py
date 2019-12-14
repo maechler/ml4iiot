@@ -1,6 +1,6 @@
 from pandas import DataFrame, Series
 from sklearn.preprocessing import MinMaxScaler as ScikitLearnMinMaxScaler
-from ml4iiot.pipeline.step import AbstractStep
+from ml4iiot.pipeline import AbstractStep
 
 
 class MinMaxScaler(AbstractStep):

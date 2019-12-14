@@ -1,4 +1,4 @@
-from ml4iiot.pipeline.step import AbstractStep
+from ml4iiot.pipeline import AbstractStep
 
 
 class AbstractOutput(AbstractStep):

@@ -1,5 +1,5 @@
 from pandas import DataFrame
-from ml4iiot.pipeline.step import AbstractStep
+from ml4iiot.pipeline import AbstractStep
 
 
 class MovingExponentialSmoothing(AbstractStep):

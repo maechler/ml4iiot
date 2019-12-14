@@ -1,6 +1,8 @@
 import yaml
 import json
-from ml4iiot.pipeline.pipeline import Pipeline
+import os
+import sys
+from ml4iiot.pipeline import Pipeline
 from ml4iiot.utility import get_cli_arguments
 
 

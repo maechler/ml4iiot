@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from pandas import DataFrame, Series
 from scipy.signal import detrend
-from ml4iiot.pipeline.step import AbstractStep
+from ml4iiot.pipeline import AbstractStep
 import numpy as np
 
 
