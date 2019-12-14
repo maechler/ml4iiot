@@ -40,6 +40,8 @@ class Pipeline:
                         step.process(data_frame)
                 except SkipDataFrameException:
                     pass
+        except Exception as e:
+            print(e)
 
         finally:
             for step in self.steps:
