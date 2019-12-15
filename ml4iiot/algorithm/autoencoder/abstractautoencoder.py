@@ -20,10 +20,7 @@ class AbstractAutoencoder(AbstractAlgorithm):
     def init(self) -> None:
         self.autoencoder = self.create_autoencoder_model()
 
-        self.autoencoder.compile(
-            optimizer=self.get_config('optimizer', default='adam'),
-            loss=self.get_config('loss', default='binary_crossentropy')
-        )
+        self.compile_autoencoder()
 
         if self.verbose:
             self.autoencoder.summary()
@@ -31,6 +28,12 @@ class AbstractAutoencoder(AbstractAlgorithm):
     @abstractmethod
     def create_autoencoder_model(self) -> Model:
         pass
+
+    def compile_autoencoder(self):
+        self.autoencoder.compile(
+             optimizer=self.get_config('optimizer', default='adam'),
+             loss=self.get_config('loss', default='binary_crossentropy')
+        )
 
     def data_frame_to_input_data(self, data_frame: DataFrame):
         return np.array([data_frame[self.get_config('input')]])
