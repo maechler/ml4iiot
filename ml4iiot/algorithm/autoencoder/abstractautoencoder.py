@@ -38,6 +38,11 @@ class AbstractAutoencoder(AbstractAlgorithm):
     def data_frame_to_input_data(self, data_frame: DataFrame):
         return np.array([data_frame[self.get_config('input')]])
 
+    def fit(self):
+        next_batch = np.array(self.next_batch)
+
+        return self.autoencoder.fit(next_batch, next_batch, batch_size=self.batch_size, epochs=self.epochs, verbose=self.verbose)
+
     def process(self, data_frame: DataFrame) -> None:
         data_frame['do_fit'] = float('nan')
         data_frame['do_predict'] = float('nan')
@@ -65,8 +70,7 @@ class AbstractAutoencoder(AbstractAlgorithm):
             self.next_batch.append(input_data[0])
 
             if len(self.next_batch) >= self.batch_size:
-                next_batch = np.array(self.next_batch)
-                history = self.autoencoder.fit(next_batch, next_batch, batch_size=self.batch_size, epochs=self.epochs, verbose=self.verbose)
+                history = self.fit()
                 data_frame['loss'] = np.average(history.history['loss'])
                 self.next_batch = []
         else:
