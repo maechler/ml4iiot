@@ -20,7 +20,7 @@ class AbstractLSTMAutoencoder(AbstractAutoencoder):
         for feature in self.features:
             input_data = np.append(input_data, data_frame[feature].values)
 
-        return input_data.reshape(1, self.time_steps, self.features_len)
+        return input_data.reshape((1, self.time_steps, self.features_len))
 
 
 class ReconstructionLSTMAutoencoder(AbstractLSTMAutoencoder):
