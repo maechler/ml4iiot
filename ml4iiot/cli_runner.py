@@ -18,10 +18,13 @@ def load_config(config_path: str, config_format: str) -> dict:
 
 def run(config_path: str, config_format: str) -> None:
     if os.path.isfile(config_path):
-        config = load_config(config_path, config_format)
-        pipeline = Pipeline(config['pipeline'])
+        try:
+            config = load_config(config_path, config_format)
+            pipeline = Pipeline(config['pipeline'])
 
-        pipeline.run()
+            pipeline.run()
+        except Exception as e:
+            print(e)
     elif os.path.isdir(config_path):
         config_folder = config_path
 
@@ -38,7 +41,6 @@ def run(config_path: str, config_format: str) -> None:
                 pipeline.run()
             except Exception as e:
                 print(e)
-                pass
     else:
         print('Invalid config path "' + config_path + '" provided.')
 
