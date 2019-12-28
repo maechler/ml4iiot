@@ -23,7 +23,7 @@ class StdOutput(AbstractOutput):
             column_name = progress_config['column']
 
             if column_name == 'index' or column_name in data_frame:
-                value = data_frame.index[-1] if column_name == 'index' else data_frame[column_name][-1]
+                value = data_frame.index[-1] if column_name == 'index' else data_frame[column_name].values[-1]
                 progress_output.append('{0}={1}'.format(column_name, value))
 
         output += ', '.join(progress_output)

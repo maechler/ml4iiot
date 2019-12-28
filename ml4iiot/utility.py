@@ -82,3 +82,10 @@ def get_cli_arguments() -> Namespace:
 
 def get_file_name_from_path(path: str) -> str:
     return str(os.path.basename(path).split('.')[0])
+
+
+def append_value_to_dict_list(my_dict: dict, key: str, value) -> None:
+    if key not in my_dict:
+        my_dict[key] = [value]
+    else:
+        my_dict[key].append(value)

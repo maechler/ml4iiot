@@ -2,7 +2,7 @@ from pandas import DataFrame
 from ml4iiot.input.abstractinput import AbstractInput
 import pandas as pd
 import csv
-from ml4iiot.utility import datetime_string_to_object
+from ml4iiot.utility import datetime_string_to_object, append_value_to_dict_list
 
 
 class CsvInput(AbstractInput):
@@ -14,7 +14,6 @@ class CsvInput(AbstractInput):
         self.reader = None
         self.stop_iteration_raised = False
         self.columns = self.get_config('columns')
-        self.index_column = self.get_config('index_column')
 
     def init(self) -> None:
         super().init()
@@ -49,19 +48,19 @@ class CsvInput(AbstractInput):
                 continue
 
             if self.get_column_type(key) == 'datetime':
-                self.append_value_to_dict(
+                append_value_to_dict_list(
                     pandas_dict,
                     key,
                     datetime_string_to_object(value, self.get_config('columns', key, 'datetime_format'))
                 )
             elif self.get_column_type(key) == 'int':
-                self.append_value_to_dict(pandas_dict, key, int(value))
+                append_value_to_dict_list(pandas_dict, key, int(value))
             elif self.get_column_type(key) == 'float':
-                self.append_value_to_dict(pandas_dict, key, float(value))
+                append_value_to_dict_list(pandas_dict, key, float(value))
             elif self.get_column_type(key) == 'str':
-                self.append_value_to_dict(pandas_dict, key, str(value))
+                append_value_to_dict_list(pandas_dict, key, str(value))
             else:
-                self.append_value_to_dict(pandas_dict, key, value)
+                append_value_to_dict_list(pandas_dict, key, value)
 
     def get_column_type(self, column_name: str) -> str:
         column_config = self.columns[column_name]
@@ -73,12 +72,6 @@ class CsvInput(AbstractInput):
             return 'str'
         else:
             return column_type
-
-    def append_value_to_dict(self, my_dict: dict, key: str, value) -> None:
-        if key not in my_dict:
-            my_dict[key] = [value]
-        else:
-            my_dict[key].append(value)
 
     def destroy(self) -> None:
         super().destroy()

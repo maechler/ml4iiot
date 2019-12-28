@@ -9,6 +9,7 @@ class AbstractInput(AbstractStep):
     def __init__(self, config):
         super().__init__(config)
 
+        self.index_column = self.get_config('index_column')
         windowing_strategy = self.get_config('windowing_strategy')
         windowing_strategy['config']['input'] = self
         self.windowing_strategy = instance_from_config(self.get_config('windowing_strategy'))
