@@ -40,10 +40,11 @@ def get_current_out_path(file_name=None) -> str:
         os.makedirs(out_path)
 
     if file_name is not None:
-        out_path = os.path.join(out_path, datetime.now().strftime('%H_%M_%S') + '_' + file_name)
+        out_path_raw = out_path
+        out_path = os.path.join(out_path_raw, datetime.now().strftime('%H_%M_%S') + '_' + file_name)
 
         while os.path.exists(out_path):
-            out_path = os.path.join(out_path, datetime.now().strftime('%H_%M_%S') + '_' + str(i) + '_' + file_name)
+            out_path = os.path.join(out_path_raw, datetime.now().strftime('%H_%M_%S') + '_' + str(i) + '_' + file_name)
             i = i + 1
 
     return out_path
