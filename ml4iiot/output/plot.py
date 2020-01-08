@@ -21,6 +21,7 @@ class PlotOutput(AbstractOutput):
         super().__init__(config)
 
         self.format = self.get_config('format', default='svg')
+        self.dpi = self.get_config('dpi', default=None)
         self.show_plots = str2bool(self.get_config('show_plots', default=True))
         self.save_to_image = str2bool(self.get_config('save_to_image', default=False))
         self.save_to_pickle = str2bool(self.get_config('save_to_pickle', default=False))
@@ -123,12 +124,12 @@ class PlotOutput(AbstractOutput):
                 ax.set_xlim([figure_config['xlim']['min'], figure_config['xlim']['max']])
 
             plt.tight_layout(0)
-            plt.legend(loc='best')
+            plt.legend(loc=get_recursive_config(figure_config, 'legend_location', default='best'))
             fig.autofmt_xdate()
 
             if self.save_to_image:
                 image_save_path = self.get_save_path_from_figure_config(figure_config, self.format)
-                fig.savefig(image_save_path, format=self.format)
+                fig.savefig(image_save_path, format=self.format, dpi=self.dpi)
 
             if self.save_to_pickle:
                 pickle_save_path = self.get_save_path_from_figure_config(figure_config, 'pickle')
