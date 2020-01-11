@@ -1,9 +1,11 @@
 from abc import abstractmethod
 import numpy as np
 from keras import Model
+from keras.callbacks import ModelCheckpoint
 from pandas import DataFrame
 from ml4iiot.algorithm.abstractalgorithm import AbstractAlgorithm
-from ml4iiot.utility import str2bool
+from ml4iiot.utility import str2bool, get_current_out_path
+from keras.models import load_model
 
 
 class AbstractAutoencoder(AbstractAlgorithm):
@@ -14,13 +16,23 @@ class AbstractAutoencoder(AbstractAlgorithm):
         self.verbose = str2bool(self.get_config('verbose', default=False))
         self.batch_size = self.get_config('batch_size', default=1)
         self.epochs = self.get_config('epochs', default=1)
+        self.save_best_model = self.get_config('save_best_model', default=False)
+        self.load_model = self.get_config('load_model', default=None)
+
         self.next_batch = []
+        self.callbacks = []
         self.autoencoder = None
 
-    def init(self) -> None:
-        self.autoencoder = self.create_autoencoder_model()
+        if self.save_best_model:
+            self.callbacks.append(ModelCheckpoint(get_current_out_path('best_model.hdf5'), save_best_only=True, monitor='loss'))
 
-        self.compile_autoencoder()
+    def init(self) -> None:
+        if self.load_model is None:
+            self.autoencoder = self.create_autoencoder_model()
+
+            self.compile_autoencoder()
+        else:
+            self.autoencoder = load_model(self.load_model)
 
         if self.verbose:
             self.autoencoder.summary()
@@ -41,7 +53,14 @@ class AbstractAutoencoder(AbstractAlgorithm):
     def fit(self):
         next_batch = np.array(self.next_batch)
 
-        return self.autoencoder.fit(next_batch, next_batch, batch_size=self.batch_size, epochs=self.epochs, verbose=self.verbose)
+        return self.autoencoder.fit(
+            next_batch,
+            next_batch,
+            batch_size=self.batch_size,
+            epochs=self.epochs,
+            verbose=self.verbose,
+            callbacks=self.callbacks,
+        )
 
     def process(self, data_frame: DataFrame) -> None:
         data_frame['do_fit'] = float('nan')
