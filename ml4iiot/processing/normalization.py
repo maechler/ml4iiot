@@ -35,12 +35,18 @@ class MinMaxScaler(AbstractStep):
         self.first_run = False
 
     def normalize(self, data_frame: DataFrame) -> None:
+        if self.source_column not in data_frame:
+            return
+
         self.fit_scaler(data_frame[self.source_column])
 
         normalized = self.scaler.transform(data_frame[[self.source_column]])
         data_frame[self.target_column] = normalized[:, 0]
 
     def denormalize(self, data_frame: DataFrame) -> None:
+        if self.source_column not in data_frame or self.fit_column not in data_frame:
+            return
+
         fit_series = data_frame[self.fit_column] if self.fit_column in data_frame else None
 
         self.fit_scaler(fit_series)

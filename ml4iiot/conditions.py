@@ -176,3 +176,16 @@ class TimeDeltaCondition(AbstractCondition):
             previous_index = index
 
         return True
+
+
+class CounterCondition(AbstractCondition):
+    def __init__(self, config):
+        super().__init__(config)
+
+        self.counter = 0
+        self.counter_target = self.get_config('counter_target')
+
+    def evaluate_logic(self, data_frame: DataFrame) -> bool:
+        self.counter = self.counter + 1
+
+        return self.counter % self.counter_target == 0
