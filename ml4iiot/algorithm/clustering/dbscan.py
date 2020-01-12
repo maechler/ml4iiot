@@ -5,6 +5,10 @@ from sklearn.cluster import DBSCAN as SkDBSCAN
 import numpy as np
 
 
+def absolute_average(x1, x2):
+    return abs(np.average(x1) - np.average(x2))
+
+
 class DBSCAN(AbstractAlgorithm):
 
     def __init__(self, config: dict):
@@ -13,7 +17,12 @@ class DBSCAN(AbstractAlgorithm):
         self.epsilon = self.get_config('epsilon')
         self.min_samples = self.get_config('min_samples')
         self.source_column = self.get_config('source_column', default=None)
-        self.db = SkDBSCAN(eps=self.epsilon, min_samples=self.min_samples)
+        self.metric = self.get_config('metric', default='euclidean')
+
+        if self.metric == 'absolute_average':
+            self.metric = absolute_average
+
+        self.db = SkDBSCAN(eps=self.epsilon, min_samples=self.min_samples, metric=self.metric)
 
     def process(self, data_frame: DataFrame) -> None:
         if not self.do_fit(data_frame) or not self.do_predict(data_frame):
@@ -45,8 +54,6 @@ class BatchDBSCAN(DBSCAN):
 
         self.source_columns = self.get_config('source_columns', default=[])
         self.queue_size = self.get_config('queue_size', default=100)
-
-        self.db = SkDBSCAN(eps=self.epsilon, min_samples=self.min_samples)
         self.queue = deque(maxlen=self.queue_size)
 
     def process(self, data_frame: DataFrame) -> None:
@@ -56,6 +63,6 @@ class BatchDBSCAN(DBSCAN):
         for column in self.source_columns:
             self.queue.append(data_frame[column].values)
 
-        if self.queue.maxlen == self.queue_size:
+        if len(self.queue) == self.queue_size:
             self.db.fit(list(self.queue))
             self.update_data_frame(data_frame)
