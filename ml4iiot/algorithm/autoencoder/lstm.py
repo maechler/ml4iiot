@@ -63,4 +63,4 @@ class PredictionLSTMAutoencoder(AbstractLSTMAutoencoder):
         source = np.delete(source, -1, axis=0)  # Remove last sample as the target for this would be in the next batch
         target = np.delete(target, 0, axis=0)  # Remove first sample as the first value of the source should predict its next value
 
-        return self.autoencoder.fit(source, target, batch_size=self.batch_size, epochs=self.epochs, verbose=self.verbose)
+        return self.autoencoder.fit(source, target, batch_size=self.batch_size, epochs=self.epochs, verbose=self.verbose, shuffle=self.shuffle)

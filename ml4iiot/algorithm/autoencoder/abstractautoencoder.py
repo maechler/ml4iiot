@@ -18,6 +18,7 @@ class AbstractAutoencoder(AbstractAlgorithm):
         self.epochs = self.get_config('epochs', default=1)
         self.save_best_model = self.get_config('save_best_model', default=False)
         self.load_model = self.get_config('load_model', default=None)
+        self.shuffle = self.get_config('shuffle', default=True)
 
         self.next_batch = []
         self.callbacks = []
@@ -60,6 +61,7 @@ class AbstractAutoencoder(AbstractAlgorithm):
             epochs=self.epochs,
             verbose=self.verbose,
             callbacks=self.callbacks,
+            shuffle=self.shuffle
         )
 
     def process(self, data_frame: DataFrame) -> None:
