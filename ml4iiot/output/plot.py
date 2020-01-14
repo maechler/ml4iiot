@@ -123,6 +123,7 @@ class PlotOutput(AbstractOutput):
             if 'xlim' in figure_config:
                 ax.set_xlim([figure_config['xlim']['min'], figure_config['xlim']['max']])
 
+            plt.rcParams.update({'font.size': get_recursive_config(figure_config, 'font_size', default=12)})
             plt.tight_layout(0)
             plt.legend(loc=get_recursive_config(figure_config, 'legend_location', default='best'))
             fig.autofmt_xdate()
