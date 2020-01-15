@@ -189,3 +189,24 @@ class CounterCondition(AbstractCondition):
         self.counter = self.counter + 1
 
         return self.counter % self.counter_target == 0
+
+
+class StanardDeviationCondition(AbstractCondition):
+    def __init__(self, config):
+        super().__init__(config)
+
+        self.column = self.get_config('column')
+        self.std_min = self.get_config('std_min', default=None)
+        self.std_max = self.get_config('std_max', default=None)
+
+    def evaluate_logic(self, data_frame: DataFrame) -> bool:
+        std = data_frame[self.column].std()
+        in_range = True
+
+        if self.std_min is not None:
+            in_range = in_range and std > self.std_min
+
+        if self.std_max is not None:
+            in_range = in_range and std < self.std_max
+
+        return in_range
