@@ -44,7 +44,7 @@ class ExponentialWeightedMovingMinMaxAverage(AbstractAlgorithm):
         super().__init__(config)
 
         self.column_mapping = self.get_config('column_mapping')
-        self.short_smoothing_factor = self.get_config('short_smoothing_factor', default=0.01)
+        self.short_smoothing_factor = self.get_config('short_smoothing_factor', default=0.1)
         self.long_smoothing_factor = self.get_config('long_smoothing_factor', default=0.01)
 
         self.short_moving_averages = {}
