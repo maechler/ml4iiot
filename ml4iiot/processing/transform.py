@@ -47,8 +47,13 @@ class FastFourierTransform(AbstractStep):
         super().__init__(config)
 
         self.column_mapping = self.get_config('column_mapping')
+        self.detrend = self.get_config('detrend', default=False)
 
     def process(self, data_frame: DataFrame) -> None:
         for source_column, target_column in self.column_mapping.items():
-            fft = np.fft.fft(detrend(data_frame[source_column].values))
+            if self.detrend:
+                fft = np.fft.fft(detrend(data_frame[source_column].values))
+            else:
+                fft = np.fft.fft(data_frame[source_column].values)
+
             data_frame[target_column] = np.absolute(fft)
