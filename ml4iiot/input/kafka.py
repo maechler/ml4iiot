@@ -43,6 +43,7 @@ class KafkaInput(AbstractInput):
             record_count = record_count + 1
 
         data_frame = pd.DataFrame.from_dict(pandas_dict)
+        data_frame.drop_duplicates(self.index_column)
         data_frame.set_index(self.index_column, inplace=True)
 
         return data_frame
