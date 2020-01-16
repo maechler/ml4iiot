@@ -25,7 +25,7 @@ def run(config_path: str, config_format: str) -> None:
             pipeline = Pipeline(config['pipeline'])
 
             pipeline.run()
-        except Exception:
+        except:
             traceback.print_exc()
     elif os.path.isdir(config_path):
         config_folder = config_path
@@ -41,7 +41,7 @@ def run(config_path: str, config_format: str) -> None:
                 pipeline = Pipeline(config['pipeline'])
 
                 pipeline.run()
-            except Exception:
+            except:
                 traceback.print_exc()
     else:
         print('Invalid config path "' + config_path + '" provided.')
