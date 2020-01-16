@@ -52,6 +52,8 @@ class PlotOutput(AbstractOutput):
         register_matplotlib_converters()
 
         for figure_config in self.get_config('figures'):
+            plt.rcParams.update({'font.size': get_recursive_config(figure_config, 'font_size', default=12)})
+
             fig, ax = plt.subplots()
             x_axis_formatter = get_recursive_config(figure_config, 'x_axis_formatter', default='datetime')
             start_datetime = get_recursive_config(figure_config, 'start_datetime', default=None)
@@ -64,12 +66,17 @@ class PlotOutput(AbstractOutput):
                 sanitized_column = self.accumulated_data_frame.loc[start_datetime:end_datetime][plot_config['column']].dropna()
                 plot_type = get_recursive_config(plot_config, 'type', default='line')
 
+                if 'label' in plot_config:
+                    label = plot_config['label'] if plot_config['label'] != 'None' else None
+                else:
+                    label = plot_config['column']
+
                 if plot_type == 'line':
                     ax.plot(
                         sanitized_column.index if x_axis_formatter == 'datetime' else list(map(lambda x: x.value, sanitized_column.index)),
                         sanitized_column.values,
                         color=self.get_color(get_recursive_config(plot_config, 'color', default=colors['blue'])),
-                        label=plot_config['label'] if 'label' in plot_config else plot_config['column'],
+                        label=label,
                         linestyle=get_recursive_config(plot_config, 'linestyle', default='solid'),
                         alpha=get_recursive_config(plot_config, 'alpha', default=1),
                         marker=get_recursive_config(plot_config, 'marker', default=None)
@@ -86,7 +93,7 @@ class PlotOutput(AbstractOutput):
                         sanitized_column.values,
                         color=self.get_color(get_recursive_config(plot_config, 'color', default=colors['blue'])),
                         bins=get_recursive_config(plot_config, 'bins', default=40),
-                        label=plot_config['label'] if 'label' in plot_config else plot_config['column'],
+                        label=label,
                         histtype=get_recursive_config(plot_config, 'histtype', default='bar'),
                         alpha=get_recursive_config(plot_config, 'alpha', default=1),
                         range=histogram_range,
