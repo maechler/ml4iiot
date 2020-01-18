@@ -11,7 +11,7 @@ class CsvOutput(AbstractOutput):
         self.do_output_condition = instance_from_config(self.get_config('do_output_condition', default={'class': 'ml4iiot.conditions.TrueCondition'}))
         self.output_file_name = self.get_config('output_file_name', default='csv_output.csv')
         self.output_file_path = get_current_out_path(self.output_file_name)
-        self.date_format = self.get_config('date_format', default='%s')
+        self.date_format = self.get_config('date_format', default='%s.%f')
         self.columns = self.get_config('columns', default=None)
         self.output_file = None
         self.write_header = True
