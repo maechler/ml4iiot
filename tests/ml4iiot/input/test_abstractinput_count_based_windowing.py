@@ -22,7 +22,7 @@ class TestInput(AbstractInput):
         return data_frame
 
     def data_row_to_data_frame(self, data_row):
-        datetime_column = self.get_config('datetime_column')
+        datetime_column = self.get_config('index_column')
         datetime_column_value = data_row[datetime_column]
         datetime_column_object = datetime.utcfromtimestamp(datetime_column_value)
 
@@ -45,7 +45,7 @@ class TestAbstractInputWithoutResample(unittest.TestCase):
                 }
             },
             'test_data': test_data,
-            'datetime_column': 'datetime',
+            'index_column': 'datetime',
         }
 
         return TestInput(config)

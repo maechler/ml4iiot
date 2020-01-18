@@ -15,7 +15,7 @@ class TestAbstractInputWithResample(unittest.TestCase):
                     'resample': resample,
                 }
             },
-            'datetime_column': 'datetime',
+            'index_column': 'datetime',
             'test_data': test_data,
         }
 
