@@ -1,5 +1,22 @@
 # Machine Learning 4 IIoT
 
+This is the repository of `ml4iiot` a framework to implement Machine Learning methods for time series data.
+
+## Architecture
+
+We abstract the entire process into a pipeline consisting of different processing steps. 
+Each pipeline must have an input, an algorithm and an output step. 
+Before and after the algorithm step there can be any number of pre- or post-processing steps.
+
+A pipeline can configured using YAML or JSON files and can be started with the CLI runner.
+
+![ml4iiot pipeline](images/pipeline.png)
+
+The main abstraction between individual pipeline steps are pandas DataFrames. 
+Each step can add additional columns to the dataframe but should not alter existing columns.
+
+![ml4iiot dataframes](images/data_frames.png)
+
 ## Development
 
 ### Setup virtualenv
@@ -46,7 +63,14 @@ snakeviz out/cli_runner.profile
 
 ## Docker
 
-TODO
+```YAML
+version: '3'
+services:
+  ml4iiot:
+    image: still/to/be/published
+    volumes:
+      - ./ml4iiot/config:/usr/src/ml4iiot/config
+```
 
 ## Pipeline configuration
 
@@ -58,91 +82,83 @@ pipeline:
     class: ml4iiot.input.csv.CsvInput
     config:
       windowing_strategy:
-        class: ml4iiot.input.windowing.timebased.TimeBasedWindowingStrategy
+        class: ml4iiot.input.windowing.CountBasedWindowingStrategy
         config:
-          window_size: 720s
-          stride_size: 360s
-          batch_size: 1000
-          resample:
-            enabled: True
-            target_sampling_rate: 10s
-            method: interpolate
-            interpolation_method: linear
+          window_size: 100
+          stride_size: 100
+          batch_size: 20000
       delimiter: ','
-      csv_file: /some/path/to/your/data.csv
-      index_column: datetime
+      csv_file: /path/to/your/data.csv
+      index_column: time
       columns:
-        datetime:
+        time:
           type: datetime
-          datetime_format: 'iso'
-        sensor_a_value: float
-        sensor_b_value: float
-  output:
-    class: ml4iiot.output.compound.CompoundOutput
-    config:
-      output_adapters:
-        - class: ml4iiot.output.std.StdOutput
-        - class: ml4iiot.output.plot.PlotOutput
-          config:
-            show_plot: True
-            save_path: ./out/
-            format: svg
-            figures:
-              - save_figure: True
-                plots:
-                  - source: input
-                    column: sensor_a_value
-                    color: '#2A638C'
-                    linestyle: solid
-                  - source: output
-                    column: average_a
-                    color: '#D01431'
-                    linestyle: --
+          datetime_format: timestamp
+        sensor_value: float
+
   algorithm:
-    class: ml4iiot.algorithm.stochastic.average.Average
+    class: ml4iiot.algorithm.stochastic.average.ExponentialWeightedMovingAverage
     config:
-      columns:
-        sensor_a_value: average_a
-        sensor_b_value: average_b
+      column_mapping:
+        sensor_value: sensor_value_average
+
+  output:
+      class: ml4iiot.output.compound.CompoundOutput
+      config:
+        output_adapters:
+          - class: ml4iiot.output.std.StdOutput
+            config:
+              show_columns_progress:
+                - column: index
+                - column: sensor_value
+                - column: sensor_value_average
+          - class: ml4iiot.output.plot.PlotOutput
+            config:
+              show_plots: True
+              figures:
+                  plots:
+                    - column: sensor_value
+                      color: blue
+                    - column: sensor_value_average
+                      color: red
 ```
 
 ### Inputs
-- [ml4iiot.input.csv.CsvInput](#CSVInput) 
-- [ml4iiot.input.kafka.KafkaInput](#KafkaInput)
+- `ml4iiot.input.csv.CsvInput`
+- `ml4iiot.input.kafka.KafkaInput`
 
 #### Windowing strategies
 
-- [ml4iiot.input.timebased.TimeBasedWindowingStrategy](#TimeBasedWindowingStrategy) 
-- [ml4iiot.input.countbased.CountBasedWindowingStrategy](#CountBasedWindowingStrategy) 
-
-### Outputs
-- [ml4iiot.output.compound.CompoundOutput](#CompoundOutput)
-- [ml4iiot.output.std.StdOutput](#StdOutput)
-- [ml4iiot.output.plot.PlotOutput](#PlotOutput)
-- [ml4iiot.output.metric.MetricOutput](#MetricOutput)
-- [ml4iiot.output.kafka.KafkaOutput](#KafkaOutput)
+- `ml4iiot.input.windowing.TimeBasedWindowingStrategy`
+- `ml4iiot.input.windowing.CountBasedWindowingStrategy` 
 
 ### Algorithms
-- [ml4iiot.algorithm.stochastic.average.Average](#Average)
-- [ml4iiot.algorithm.stochastic.average_low_high_pass.AverageLowHighPass](#AverageLowHighPass)
-- [ml4iiot.algorithm.stochastic.mad.Mad](#Mad)
-- [ml4iiot.algorithm.autoencoder.fullyconnected.FullyConnectedAutoencoder](#FullyConnectedAutoencoder)
+- `ml4iiot.algorithm.stochastic.average.ExponentialWeightedMovingAverage`
+- `ml4iiot.algorithm.stochastic.average.ExponentialWeightedMovingMinMaxAverage`
+- `ml4iiot.algorithm.stochastic.mad.Mad`
+- `ml4iiot.algorithm.stochastic.zscore.ModifiedZScore`
+- `ml4iiot.algorithm.clustering.dbscan.DBSCAN`
+- `ml4iiot.algorithm.autoencoder.fullyconnected.FullyConnectedAutoencoder`
+- `ml4iiot.algorithm.autoencoder.cnn.CNNAutoencoder`
+- `ml4iiot.algorithm.autoencoder.cnn.BottleneckCNNAutoencoder`
+- `ml4iiot.algorithm.autoencoder.lstm.ReconstructionLSTMAutoencoder`
+- `ml4iiot.algorithm.autoencoder.lstm.PredictionLSTMAutoencoder`
+- `ml4iiot.algorithm.autoencoder.variational.VariationalAutoencoder`
 
-### CSVInput
+### Processing
+- `ml4iiot.processing.normalization.MinMaxScaler`
+- `ml4iiot.processing.smoothing.MovingExponentialSmoothing`
+- `ml4iiot.processing.transform.Average`
+- `ml4iiot.processing.transform.StandardDeviation`
+- `ml4iiot.processing.transform.Minimum`
+- `ml4iiot.processing.transform.Maximum`
+- `ml4iiot.processing.transform.FastFourierTransform`
+- `ml4iiot.processing.control.SkipDataFrame`
 
-### KafkaInput  
-
-
-### FullyConnectedAutoencoder
-
-```yaml
-    class: ml4iiot.algorithm.autoencoder.fullyconnected.FullyConnectedAutoencoder
-    config:
-      column: sensor_value
-      layer:
-        - dimension: 90
-        - dimension: 70
-        - dimension: 50
-        - dimension: 70
-        - dimension: 90
-```
+### Outputs
+- `ml4iiot.output.compound.CompoundOutput`
+- `ml4iiot.output.std.StdOutput`
+- `ml4iiot.output.plot.PlotOutput`
+- `ml4iiot.output.csv.CsvOutput`
+- `ml4iiot.output.kafka.KafkaOutput`
+- `ml4iiot.output.config.ConfigOutput`

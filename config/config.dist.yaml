@@ -3,55 +3,42 @@ pipeline:
     class: ml4iiot.input.csv.CsvInput
     config:
       windowing_strategy:
-        class: ml4iiot.input.windowing.timebased.TimeBasedWindowingStrategy
+        class: ml4iiot.input.windowing.CountBasedWindowingStrategy
         config:
-          window_size: 720s
-          stride_size: 360s
-          batch_size: 1000
-          resample:
-            enabled: True
-            target_sampling_rate: 10s
-            method: interpolate
-            interpolation_method: linear
+          window_size: 100
+          stride_size: 100
+          batch_size: 20000
       delimiter: ','
-      csv_file: /some/path/to/your/data.csv
-      index_column: datetime
+      csv_file: /path/to/your/data.csv
+      index_column: time
       columns:
-        datetime:
+        time:
           type: datetime
-          datetime_format: 'iso'
-        sensor_a_value: float
-        sensor_b_value: float
-
-  preprocessing:
+          datetime_format: timestamp
+        sensor_value: float
 
   algorithm:
-    class: ml4iiot.algorithms.stochastic.average.Average
+    class: ml4iiot.algorithm.stochastic.average.ExponentialWeightedMovingAverage
     config:
-      columns:
-        sensor_a_value: average_a
-        sensor_b_value: average_b
-
-  postprocessing:
+      column_mapping:
+        sensor_value: sensor_value_average
 
   output:
-    class: ml4iiot.output.compound.CompoundOutput
-    config:
-      output_adapters:
-        - class: ml4iiot.output.std.StdOutput
-        - class: ml4iiot.output.plot.PlotOutput
-          config:
-            show_plot: True
-            save_path: ./out/
-            format: svg
-            figures:
-              - save_figure: True
-                plots:
-                  - source: input
-                    column: sensor_a_value
-                    color: '#2A638C'
-                    linestyle: solid
-                  - source: output
-                    column: average_a
-                    color: '#D01431'
-                    linestyle: --
+      class: ml4iiot.output.compound.CompoundOutput
+      config:
+        output_adapters:
+          - class: ml4iiot.output.std.StdOutput
+            config:
+              show_columns_progress:
+                - column: index
+                - column: sensor_value
+                - column: sensor_value_average
+          - class: ml4iiot.output.plot.PlotOutput
+            config:
+              show_plots: True
+              figures:
+                  plots:
+                    - column: sensor_value
+                      color: blue
+                    - column: sensor_value_average
+                      color: red
