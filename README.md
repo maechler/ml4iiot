@@ -2,6 +2,20 @@
 
 This is the repository of `ml4iiot` a framework to implement Machine Learning methods for time series data.
 
+## Example: Autoencoder on FFT of IMS Bearing Data Set
+
+This example shows an autoencoder being trained on the Fast Fourier transform 
+of the acceleration of bearing 1 of the [IMS Bearing Data Set](https://ti.arc.nasa.gov/tech/dash/groups/pcoe/prognostic-data-repository/).
+The configuration of this experiment can be found in `config/ims_bearing_data_set_autoencoder.yaml`. 
+The autoencoder learns (adjusts its weights) and predicts until the `2004-02-17` and after that does only predictions anymore (see `do_fit`).
+The results show that the upcoming crash shows up in an increasing reconstruction error of the autoencoder.
+
+- Run IMS Bearing Data Set Autoencoder example: `python ml4iiot/cli_runner.py -c config/ims_bearing_data_set_autoencoder.yaml`
+- Plot acceleration of bearing 1: `python ml4iiot/plot_csv.py -p out/YYYY_MM_DD/ims_bearing_data_set/HH_MM_SS_csv_output.csv -itime acceleration_bearing_1`
+- Plot reconstruction error: `python ml4iiot/plot_csv.py -p out/YYYY_MM_DD/ims_bearing_data_set/HH_MM_SS_csv_output.csv -itime absolute_reconstruction_error_moving`
+
+![ml4iiot pipeline](images/ims_autoencoder.png)
+
 ## Architecture
 
 We abstract the entire process into a pipeline consisting of different processing steps. 

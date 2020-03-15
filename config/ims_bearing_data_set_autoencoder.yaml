@@ -1,0 +1,106 @@
+pipeline:
+#  settings:
+#    keras_backend: plaidml.keras.backend
+
+  input:
+    class: ml4iiot.input.csv.CsvInput
+    config:
+      windowing_strategy:
+        class: ml4iiot.input.windowing.CountBasedWindowingStrategy
+        config:
+          window_size: 500
+          stride_size: 500
+          batch_size: 500000
+      delimiter: ','
+      csv_file: /Users/maechler/projects/fhnw/p8/data/nasa/nasa_bearing_2nd_test.csv
+      index_column: time
+      columns:
+        time:
+          type: datetime
+          datetime_format: timestamp
+        acceleration_bearing_1: float
+        #acceleration_bearing_2: float
+        #acceleration_bearing_3: float
+        #acceleration_bearing_4: float
+
+  preprocessing:
+    - class: ml4iiot.processing.transform.FastFourierTransform
+      config:
+        detrend: True
+        column_mapping:
+          acceleration_bearing_1: acceleration_bearing_1_fft
+    - class: ml4iiot.processing.normalization.MinMaxScaler
+      config:
+        source_range_min: window
+        source_range_max: window
+        source_column: acceleration_bearing_1_fft
+        target_column: acceleration_bearing_1_fft_normalized
+
+    - class: ml4iiot.processing.control.SkipDataFrame
+      config:
+        do_skip:
+          class: ml4iiot.conditions.TimeDeltaCondition
+          config:
+            max_time_delta:
+              seconds: 1
+
+  algorithm:
+    class: ml4iiot.algorithm.autoencoder.fullyconnected.FullyConnectedAutoencoder
+    config:
+      batch_size: 250
+      epochs: 600
+      input: acceleration_bearing_1_fft_normalized
+      layer:
+        - dimension: 500
+        - dimension: 350
+        - dimension: 500
+      do_fit_condition:
+        class: ml4iiot.conditions.CompositeCondition
+        config:
+          conditions:
+            - class: ml4iiot.conditions.DatetimeCondition
+              config:
+                end_datetime: '2004-02-17T00:00:00.000Z'
+
+  postprocessing:
+    - class: ml4iiot.processing.normalization.MinMaxScaler
+      config:
+        mode: denormalize
+        source_range_min: window
+        source_range_max: window
+        fit_column: acceleration_bearing_1_fft
+        source_column: reconstruction
+        target_column: acceleration_bearing_1_fft_denormalized
+    - class: ml4iiot.processing.smoothing.MovingExponentialSmoothing
+      config:
+        column_mapping:
+          absolute_reconstruction_error: absolute_reconstruction_error_moving
+
+  output:
+      class: ml4iiot.output.compound.CompoundOutput
+      config:
+        output_adapters:
+        - class: ml4iiot.output.config.ConfigOutput
+        - class: ml4iiot.output.std.StdOutput
+          config:
+            show_columns_progress:
+              - column: index
+              - column: acceleration_bearing_1_fft_denormalized
+              - column: acceleration_bearing_1_fft
+              - column: absolute_reconstruction_error
+              - column: absolute_reconstruction_error_moving
+              - column: relative_reconstruction_error
+              - column: do_fit
+            show_input: False
+            show_output: False
+        - class: ml4iiot.output.csv.CsvOutput
+          config:
+            columns:
+              - acceleration_bearing_1
+              - acceleration_bearing_1_fft
+              - acceleration_bearing_1_fft_denormalized
+              - relative_reconstruction_error
+              - absolute_reconstruction_error
+              - absolute_reconstruction_error_moving
+              - loss
+              - do_fit

@@ -6,6 +6,7 @@
 
 /config/*
 !/config/config.dist.yaml
+!/config/ims_bearing_data_set_autoencoder.yaml
 
 /out/*
 !/out/.gitkeep
